@@ -107,10 +107,12 @@ public class OtpService {
         challenge.setVerified(true);
         challenges.save(challenge);
 
-        UserAccount user = users.findByPhone(phone).orElseGet(() -> createCustomer(phone));
-        if (user.getRole() != Role.CUSTOMER) {
-            throw new ApiException(HttpStatus.CONFLICT, "This mobile number is already registered for another account type.");
-        }
+        // Customer OTP authentication is independent of partner/admin accounts.
+        // A person may use the same mobile number in the customer app even if
+        // that number already exists on a partner/admin account. Find only a
+        // CUSTOMER account here; otherwise create a separate customer account.
+        UserAccount user = users.findByPhoneAndRole(phone, Role.CUSTOMER)
+                .orElseGet(() -> createCustomer(phone));
         if (user.getStatus() != AccountStatus.ACTIVE) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Customer account is not active.");
         }
