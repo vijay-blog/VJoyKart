@@ -337,6 +337,10 @@ class ProductFormViewModel(
         _uiState.update { it.copy(unit = value, isDirty = true) }
     }
 
+    fun onImageUrlChanged(value: String) {
+        _uiState.update { it.copy(imageUrl = value, isDirty = true) }
+    }
+
     fun hasUnsavedChanges(): Boolean = _uiState.value.isDirty
 
     fun retry() {
@@ -361,7 +365,8 @@ class ProductFormViewModel(
             discountPercent = state.discountPercent.trim().ifBlank { null },
             stock = state.stock.trim().ifBlank { null },
             sku = state.sku.trim().ifBlank { null },
-            unit = state.unit.trim().ifBlank { null }
+            unit = state.unit.trim().ifBlank { null },
+            imageUrl = state.imageUrl.trim().ifBlank { null }
         )
 
         viewModelScope.launch {
@@ -412,7 +417,8 @@ class ProductFormViewModel(
             val parsed = state.discountPercent.trim().toBigDecimalOrNull()
             when {
                 parsed == null -> "Enter a valid discount percentage."
-                parsed < BigDecimal.ZERO || parsed > BigDecimal(100) -> "Discount must be between 0 and 100."
+                parsed < BigDecimal.ZERO || parsed > BigDecimal(100) ->
+                    "Discount must be between 0 and 100."
                 else -> null
             }
         } else null
@@ -479,6 +485,7 @@ class ProductFormViewModel(
                             stock = product.stock?.toString().orEmpty(),
                             sku = product.sku.orEmpty(),
                             unit = product.unit.orEmpty(),
+                            imageUrl = product.imageUrl.orEmpty(),
                             isDirty = false
                         )
                     }

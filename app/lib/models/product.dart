@@ -52,106 +52,87 @@ class Product {
     if (imgs.isEmpty && imageFromServer.isNotEmpty) {
       imgs.add(imageFromServer);
     }
-    if (imgs.isEmpty) {
-      imgs
-        ..clear()
-        ..add(_localImageFor((j['name'] ?? '').toString()));
-    }
+    final price = _number(j['price'] ?? j['mrp']);
+    final discountedPrice = _number(
+      j['discountedPrice'] ?? j['sellingPrice'] ?? price,
+    );
+    final availability = j['availability']?.toString().toUpperCase();
+    final status = j['status']?.toString().toUpperCase();
+    final hasStock = j.containsKey('stock') || j.containsKey('stockQuantity');
+    final stock = _integer(j['stock'] ?? j['stockQuantity']);
     return Product(
-      id: j['id'] is num
-          ? (j['id'] as num).toInt()
-          : int.tryParse((j['id'] ?? '0').toString()) ?? 0,
+      id: _integer(j['productId'] ?? j['id']),
       name: (j['name'] ?? '').toString(),
       description: (j['description'] ?? '').toString(),
       brand: (j['brand'] ?? '').toString(),
       categoryId: (j['categoryId'] ?? '').toString(),
       categoryName: (j['categoryName'] ?? j['category'] ?? '').toString(),
       images: imgs,
-      mrp: (j['mrp'] ?? 0).toDouble(),
-      sellingPrice: (j['sellingPrice'] ?? 0).toDouble(),
-      discountPercentage: (j['discountPercentage'] as num? ?? 0).toDouble(),
+      mrp: price,
+      sellingPrice: discountedPrice,
+      discountPercentage: _number(
+        j['discountPercent'] ?? j['discountPercentage'],
+      ),
       unit: (j['unit'] ?? '1 unit').toString(),
       weight: (j['weight'] ?? '').toString(),
       size: (j['size'] ?? '').toString(),
       attributes: (j['attributes'] is Map)
-          ? (j['attributes'] as Map)
-              .map((k, v) => MapEntry(k.toString(), v.toString()))
+          ? (j['attributes'] as Map).map(
+              (k, v) => MapEntry(k.toString(), v.toString()),
+            )
           : const <String, String>{},
-      available: (j['available'] ?? j['availability'] ?? true) == true,
-      stockQuantity: (j['stockQuantity'] as num? ?? 0).toInt(),
+      available:
+          status != 'INACTIVE' &&
+          availability != 'UNAVAILABLE' &&
+          availability != 'OUT_OF_STOCK' &&
+          (j['available'] ?? true) != false &&
+          (!hasStock || stock > 0),
+      stockQuantity: stock,
       deliveryType: (j['deliveryType'] ?? 'SMALL').toString(),
     );
   }
 
-  static String _localImageFor(String name) {
-    final value = name.toLowerCase();
-    if (RegExp(r'\bac\b').hasMatch(value)) {
-      return 'assets/images/products/ac.png';
-    }
-    const matches = <String, String>{
-      'rice': 'rice',
-      'atta': 'atta',
-      'flour': 'atta',
-      'dal': 'dal',
-      'oil': 'oil',
-      'apple': 'apple',
-      'banana': 'banana',
-      'mango': 'mango',
-      'grape': 'grapes',
-      'tomato': 'tomato',
-      'potato': 'potato',
-      'onion': 'onion',
-      'milk': 'milk',
-      'curd': 'curd',
-      'paneer': 'paneer',
-      'butter': 'butter',
-      'egg': 'eggs',
-      'chicken': 'chicken',
-      'mutton': 'mutton',
-      'fish': 'fish',
-      'diaper': 'baby_diapers',
-      'wipe': 'baby_wipes',
-      'lotion': 'baby_lotion',
-      't-shirt': 'men_tshirt',
-      'dress': 'women_dress',
-      'shoe': 'shoes',
-      'earbud': 'earbuds',
-      'mobile': 'mobile',
-      'phone': 'mobile',
-      'laptop': 'laptop',
-      'tv': 'tv',
-      'refrigerator': 'refrigerator',
-      'washing': 'washing_machine',
-      'sofa': 'sofa',
-      'bed': 'bed',
-      'table': 'table',
-      'chair': 'chair',
-    };
-    for (final entry in matches.entries) {
-      if (value.contains(entry.key)) {
-        return 'assets/images/products/${entry.value}.png';
-      }
-    }
-    return 'assets/images/products/rice.png';
-  }
+  static double _number(dynamic value) =>
+      value is num ? value.toDouble() : double.tryParse('$value') ?? 0;
+
+  static int _integer(dynamic value) =>
+      value is num ? value.toInt() : int.tryParse('$value') ?? 0;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'description': description,
-        'brand': brand,
-        'categoryId': categoryId,
-        'categoryName': categoryName,
-        'images': images,
-        'mrp': mrp,
-        'sellingPrice': sellingPrice,
-        'discountPercentage': discountPercentage,
-        'unit': unit,
-        'weight': weight,
-        'size': size,
-        'attributes': attributes,
-        'available': available,
-        'stockQuantity': stockQuantity,
-        'deliveryType': deliveryType,
-      };
+    'id': id,
+    'name': name,
+    'description': description,
+    'brand': brand,
+    'categoryId': categoryId,
+    'categoryName': categoryName,
+    'images': images,
+    'mrp': mrp,
+    'sellingPrice': sellingPrice,
+    'discountPercentage': discountPercentage,
+    'unit': unit,
+    'weight': weight,
+    'size': size,
+    'attributes': attributes,
+    'available': available,
+    'stockQuantity': stockQuantity,
+    'deliveryType': deliveryType,
+  };
+}
+
+class CategoryItem {
+  final String id;
+  final String name;
+  final String imageUrl;
+
+  const CategoryItem({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+  });
+
+  factory CategoryItem.fromJson(Map<String, dynamic> json) => CategoryItem(
+    id: (json['categoryId'] ?? json['id'] ?? '').toString(),
+    name: (json['name'] ?? '').toString(),
+    imageUrl: (json['imageUrl'] ?? '').toString(),
+  );
 }

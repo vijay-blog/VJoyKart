@@ -139,6 +139,9 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
         binding.productUnitInput.doAfterTextChanged {
             if (!suppressFieldWatchers) viewModel.onUnitChanged(it?.toString().orEmpty())
         }
+        binding.productImageUrlInput.doAfterTextChanged {
+            if (!suppressFieldWatchers) viewModel.onImageUrlChanged(it?.toString().orEmpty())
+        }
 
         binding.productCategoryInput.setOnItemClickListener { parent, _, position, _ ->
             if (suppressCategorySelectionCallback) return@setOnItemClickListener
@@ -222,6 +225,9 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
         }
         if (binding.productUnitInput.text?.toString() != state.unit) {
             binding.productUnitInput.setText(state.unit)
+        }
+        if (binding.productImageUrlInput.text?.toString() != state.imageUrl) {
+            binding.productImageUrlInput.setText(state.imageUrl)
         }
         suppressFieldWatchers = false
 

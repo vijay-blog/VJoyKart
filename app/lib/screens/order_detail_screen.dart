@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/catalog_image.dart';
 import 'package:intl/intl.dart';
 
 import '../models/order.dart';
@@ -103,8 +104,8 @@ class OrderDetailScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   ...order.items.map((x) => ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: Image.asset(
-                          x.product.imageAsset,
+                        leading: CatalogImage(
+                          source: x.product.imageAsset,
                           width: 48,
                           height: 48,
                         ),

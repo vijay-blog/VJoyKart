@@ -126,9 +126,11 @@ class ProductManagementRepositoryImpl(
         val price = parseAmount(dto.price)
         val discountedPrice = parseAmount(dto.discountedPrice)
         val discountPercent = parseAmount(dto.discountPercent)
+        val discountAmount = parseAmount(dto.discountAmount)
         if ((!dto.price.isNullOrBlank() && price == null) ||
             (!dto.discountedPrice.isNullOrBlank() && discountedPrice == null) ||
-            (!dto.discountPercent.isNullOrBlank() && discountPercent == null)
+            (!dto.discountPercent.isNullOrBlank() && discountPercent == null) ||
+            (!dto.discountAmount.isNullOrBlank() && discountAmount == null)
         ) {
             return invalid("Invalid product details response from server.")
         }
@@ -156,7 +158,8 @@ class ProductManagementRepositoryImpl(
                 imageUrl = dto.imageUrl?.trim(),
                 createdAt = dto.createdAt?.trim(),
                 updatedAt = dto.updatedAt?.trim(),
-                allowedActions = allowedActions
+                allowedActions = allowedActions,
+                discountAmount = discountAmount
             )
         )
     }

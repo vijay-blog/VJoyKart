@@ -39,11 +39,29 @@ Razorpay credentials are only required for online payment. COD order creation wo
 
 ## Start the customer app
 
+The repository also contains a separate native partner/admin Gradle module under
+`app/src`. Running the root `gradlew` builds that operations APK, whose expected
+startup is email/password login. It is not the customer application.
+
+Always build the customer APK with Flutter from the `app` directory:
+
 ```powershell
 cd app
 flutter pub get
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080/api/v1
 ```
+
+Production customer artifacts:
+
+```powershell
+cd app
+flutter build apk --release
+flutter build appbundle --release
+```
+
+The customer APK uses application ID `com.vjoykart.customer` and is written to
+`app/build/app/outputs/flutter-apk/app-release.apk`. It opens splash then Home;
+mobile OTP is requested only after the customer continues from Cart to Checkout.
 
 `10.0.2.2` reaches the host from the Android emulator. For a physical Android
 device, supply your development computer's LAN address instead:
@@ -112,7 +130,7 @@ npm run build
 
 - Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `RAZORPAY_KEY_ID`, and `RAZORPAY_KEY_SECRET` from environment variables.
 - Use HTTPS for production API URLs and Razorpay callbacks.
-- Replace guest customer session with mobile OTP/auth token enforcement before public release.
+- Keep customer authentication guest-first and enforce mobile OTP only at checkout.
 - Restrict CORS origins in production via deployment configuration.
 - Keep Flyway migrations as the only schema-change mechanism; Hibernate remains `ddl-auto=validate`.
 

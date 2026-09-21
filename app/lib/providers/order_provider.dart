@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
+import '../core/api_client.dart';
 import '../models/order.dart';
 import '../models/cart_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,11 +20,45 @@ class OrderProvider extends ChangeNotifier {
   }
 
   Future<void> _load() async {
-    final prefs=await SharedPreferences.getInstance();
-    final raw=prefs.getStringList('zp.orders')??const [];
-    orders..clear()..addAll(raw.map((x)=>CustomerOrder.fromJson(jsonDecode(x) as Map<String,dynamic>)));
-    try { final customerId=await _session.ensureCustomerId(); final data=await _api.get('/orders',{'customerId':'$customerId'}); if(data is List){orders..clear()..addAll(data.whereType<Map<String,dynamic>>().map(CustomerOrder.fromJson)); await _persist();} } catch(_) {}
-    initialized=true; notifyListeners();
+    final authenticated = await _session.isAuthenticated();
+    if (!authenticated) {
+      initialized = true;
+      notifyListeners();
+      return;
+    }
+    await refresh();
+  }
+
+  Future<void> refresh() async {
+    final authenticated = await _session.isAuthenticated();
+    if (!authenticated) {
+      orders.clear();
+      initialized = true;
+      notifyListeners();
+      return;
+    }
+    try {
+      final data = await _api.get('/customer/orders');
+      final content = data is Map<String, dynamic> ? data['content'] : data;
+      if (content is List) {
+        orders
+          ..clear()
+          ..addAll(content
+              .whereType<Map<String, dynamic>>()
+              .map(CustomerOrder.fromJson));
+        await _persist();
+      }
+    } on ApiException {
+      // Keep persisted orders while the backend is temporarily unavailable.
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getStringList('zp.orders') ?? const [];
+      if (orders.isEmpty) {
+        orders.addAll(raw.map((x) =>
+            CustomerOrder.fromJson(jsonDecode(x) as Map<String, dynamic>)));
+      }
+    }
+    initialized = true;
+    notifyListeners();
   }
 
   Future<void> _persist() async {
@@ -39,13 +74,10 @@ class OrderProvider extends ChangeNotifier {
     Address address, {
     String paymentMethod = 'COD',
   }) async {
-    final customerId = await _session.ensureCustomerId();
-    final response = await _api.post('/orders', {
-      'customerId': customerId,
+    await _session.ensureCustomerId();
+    final response = await _api.post('/customer/orders', {
       'address': address.toJson(),
       'paymentMethod': paymentMethod,
-      'idempotencyKey':
-          'checkout_${customerId}_${DateTime.now().millisecondsSinceEpoch}',
       'items': items
           .map((x) => {'productId': x.product.id, 'quantity': x.quantity})
           .toList(),

@@ -7,6 +7,9 @@ import '../providers/cart_provider.dart';
 import '../providers/order_provider.dart';
 import 'order_success_screen.dart';
 import 'saved_addresses_screen.dart';
+import 'otp_login_screen.dart';
+import '../services/customer_session.dart';
+import '../widgets/catalog_image.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -16,6 +19,8 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool loading = false;
+  bool authenticated = false;
+  bool checkingSession = true;
   String paymentMethod = 'COD';
   int? _pendingOnlineOrderId;
   late final Razorpay _razorpay;
@@ -27,6 +32,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    _checkSession();
+  }
+
+  Future<void> _checkSession() async {
+    final ok = await CustomerSession().isAuthenticated();
+    if (!mounted) return;
+    setState(() {
+      authenticated = ok;
+      checkingSession = false;
+    });
+    if (ok) {
+      await context.read<OrderProvider>().refresh();
+    }
+  }
+
+  void _authenticated() async {
+    if (!mounted) return;
+    setState(() => authenticated = true);
+    await context.read<OrderProvider>().refresh();
   }
 
   @override
@@ -57,7 +81,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           'amount': (paymentOrder.amount * 100).round(),
           'currency': paymentOrder.currency,
           'order_id': paymentOrder.gatewayOrderId,
-          'name': 'NexaMart',
+          'name': 'VJoyKart',
           'description': 'Order ${order.orderNumber}',
           'prefill': {'contact': selected.mobile, 'name': selected.name},
           'theme': {'color': '#3454D1'},
@@ -126,7 +150,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         appBar: AppBar(
             title: const Text('Checkout',
                 style: TextStyle(fontWeight: FontWeight.w900))),
-        body: ListView(padding: const EdgeInsets.all(18), children: [
+        body: checkingSession
+            ? const Center(child: CircularProgressIndicator())
+            : !authenticated
+                ? OtpLoginView(onAuthenticated: _authenticated)
+                : ListView(padding: const EdgeInsets.all(18), children: [
           const Text('Delivery address',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
@@ -170,8 +198,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       children: cart.items
                           .map((x) => ListTile(
                                 contentPadding: EdgeInsets.zero,
-                                leading: Image.asset(x.product.imageAsset,
-                                    width: 40, height: 40),
+                                leading: CatalogImage(
+                                    source: x.product.imageAsset,
+                                    width: 40,
+                                    height: 40),
                                 title: Text(x.product.name),
                                 subtitle:
                                     Text('${x.product.unit} × ${x.quantity}'),

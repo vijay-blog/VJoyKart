@@ -33,4 +33,18 @@ security:
   bootstrap-admin:
     email: ${NEXAMART_ADMIN_EMAIL:}
     password: ${NEXAMART_ADMIN_PASSWORD:}
-    name: ${NEXAMART_ADMIN_NAME:NexaMart Admin}
+    name: ${NEXAMART_ADMIN_NAME:VJoyKart Admin}
+
+
+nexamart:
+  jwt-secret: ${NEXAMART_JWT_SECRET:}
+  access-token-minutes: ${NEXAMART_ACCESS_TOKEN_MINUTES:60}
+  refresh-token-days: ${NEXAMART_REFRESH_TOKEN_DAYS:30}
+  admin-username: ${NEXAMART_ADMIN_USERNAME:admin}
+  admin-password: ${NEXAMART_ADMIN_PASSWORD:admin@223}
+  admin-email: ${NEXAMART_ADMIN_EMAIL:admin@nexamart.local}
+  admin-name: ${NEXAMART_ADMIN_NAME:VJoyKart Admin}
+  otp-api-key: ${TWO_FACTOR_API_KEY:}
+  otp-template-name: ${TWO_FACTOR_TEMPLATE_NAME:}
+  otp-ttl-seconds: ${OTP_TTL_SECONDS:300}
+  otp-dev-mode: ${OTP_DEV_MODE:false}

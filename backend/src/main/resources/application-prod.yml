@@ -5,4 +5,8 @@ spring:
     hikari:
       maximum-pool-size: ${DB_POOL_SIZE:10}
 nexamart:
-  jwt-secret: ${JWT_SECRET}
+  jwt-secret: ${JWT_SECRET:${NEXAMART_JWT_SECRET:}}
+  otp-api-key: ${TWO_FACTOR_API_KEY:}
+  otp-template-name: ${TWO_FACTOR_TEMPLATE_NAME:}
+  otp-ttl-seconds: ${OTP_TTL_SECONDS:300}
+  otp-dev-mode: ${OTP_DEV_MODE:false}

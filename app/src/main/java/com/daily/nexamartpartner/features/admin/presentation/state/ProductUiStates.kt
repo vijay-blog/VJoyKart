@@ -55,6 +55,7 @@ data class ProductFormUiState(
     val stock: String = "",
     val sku: String = "",
     val unit: String = "",
+    val imageUrl: String = "",
     val fieldErrors: FieldErrors = FieldErrors(),
     val content: Content = Content.Editing
 ) {

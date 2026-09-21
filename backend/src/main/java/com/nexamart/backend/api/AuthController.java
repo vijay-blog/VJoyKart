@@ -3,6 +3,7 @@ package com.nexamart.backend.api;
 import com.nexamart.backend.api.ApiModels.*;
 import com.nexamart.backend.exception.ApiException;
 import com.nexamart.backend.service.AuthService;
+import com.nexamart.backend.service.OtpService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
   private final AuthService auth;
-  public AuthController(AuthService auth) { this.auth = auth; }
+  private final OtpService otp;
+  public AuthController(AuthService auth, OtpService otp) { this.auth = auth; this.otp = otp; }
 
   @PostMapping("/login")
   public LoginResponse login(@Valid @RequestBody LoginRequest request) {
@@ -24,6 +26,17 @@ public class AuthController {
   @PostMapping("/customer/register")
   public LoginResponse registerCustomer(@Valid @RequestBody RegisterRequest request) {
     return auth.registerCustomer(request);
+  }
+
+
+  @PostMapping("/customer/send-otp")
+  public OtpSendResponse sendCustomerOtp(@Valid @RequestBody OtpRequest request) {
+    return otp.sendOtp(request.phone());
+  }
+
+  @PostMapping("/customer/verify-otp")
+  public LoginResponse verifyCustomerOtp(@Valid @RequestBody VerifyOtpRequest request) {
+    return otp.verifyOtp(request.phone(), request.otp());
   }
 
   @PostMapping("/refresh")

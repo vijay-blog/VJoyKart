@@ -32,14 +32,17 @@ void main() {
   group('Repositories', () {
     test('loads categories from REST response', () async {
       final mockClient = MockClient((request) async {
-        if (request.url.path.endsWith('/categories')) {
+        if (request.url.path.endsWith('/catalog/categories')) {
           return http.Response(
-              jsonEncode([
-                {
-                  'name': 'Grocery',
-                  'imageUrl': 'assets/images/products/rice.png'
-                }
-              ]),
+              jsonEncode({
+                'content': [
+                  {
+                    'categoryId': '1',
+                    'name': 'Grocery',
+                    'imageUrl': 'https://cdn.example.com/grocery.png'
+                  }
+                ]
+              }),
               200);
         }
         return http.Response('[]', 200);
@@ -48,6 +51,7 @@ void main() {
           RestProductRepository(apiClient: ApiClient(client: mockClient));
       final categories = await repo.getCategories();
       expect(categories.first.name, 'Grocery');
+      expect(categories.first.id, '1');
     });
   });
 }

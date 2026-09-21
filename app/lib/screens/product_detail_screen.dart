@@ -5,6 +5,7 @@ import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import 'cart_screen.dart';
 import 'checkout_screen.dart';
+import '../widgets/catalog_image.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -54,7 +55,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
     final product = widget.product;
-    final item = cart.items.where((x) => x.product.id == product.id).firstOrNull;
+    final item =
+        cart.items.where((x) => x.product.id == product.id).firstOrNull;
 
     return Scaffold(
       appBar: AppBar(
@@ -105,7 +107,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Container(
             height: 330,
             color: const Color(0xfff2f5ff),
-            child: Image.asset(product.imageAsset, fit: BoxFit.contain),
+            child:
+                CatalogImage(source: product.imageAsset, fit: BoxFit.contain),
           ),
           Padding(
             padding: const EdgeInsets.all(20),
@@ -131,8 +134,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 const SizedBox(height: 8),
                 Text(
                   product.name,
-                  style:
-                      const TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
+                  style: const TextStyle(
+                      fontSize: 25, fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 5),
                 Text(
@@ -140,13 +143,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   style: TextStyle(color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 6),
-                const Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 18),
-                    SizedBox(width: 4),
-                    Text('4.4 • 120+ reviews'),
-                  ],
-                ),
                 const SizedBox(height: 14),
                 Row(
                   children: [
@@ -182,11 +178,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Delivery Type: ${product.deliveryType}',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
+                if (product.stock > 0) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Stock: ${product.stock}',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ],
                 const SizedBox(height: 18),
                 const Text(
                   'About this product',
@@ -198,20 +196,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   style: const TextStyle(height: 1.5, color: Colors.black54),
                 ),
                 const SizedBox(height: 20),
-                const ListTile(
+                ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Icon(Icons.local_shipping_outlined),
-                  title: Text('Delivery in Hyderabad'),
-                  subtitle: Text(
-                    'Availability and delivery time will be confirmed by the backend.',
-                  ),
-                ),
-                const ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(Icons.list_alt_outlined),
-                  title: Text('Specifications'),
-                  subtitle:
-                      Text('Brand, unit, weight and category details available.'),
+                  leading: const Icon(Icons.category_outlined),
+                  title: const Text('Category'),
+                  subtitle: Text(product.categoryName),
                 ),
                 if (item != null)
                   Container(

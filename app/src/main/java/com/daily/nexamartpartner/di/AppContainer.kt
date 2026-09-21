@@ -12,10 +12,10 @@ import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendAdmi
 import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendAdminOrdersContract
 import com.daily.nexamartpartner.features.admin.data.contract.DeliveryPartnerContract
 import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendDeliveryPartnerContract
-import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendProductManagementContract
+import com.daily.nexamartpartner.features.admin.data.contract.BackendProductManagementContract
 import com.daily.nexamartpartner.features.admin.data.contract.ProductManagementContract
 import com.daily.nexamartpartner.features.admin.category.data.contract.CategoryManagementContract
-import com.daily.nexamartpartner.features.admin.category.data.contract.PendingBackendCategoryManagementContract
+import com.daily.nexamartpartner.features.admin.category.data.contract.BackendCategoryManagementContract
 import com.daily.nexamartpartner.features.admin.category.data.repository.CategoryManagementRepositoryImpl
 import com.daily.nexamartpartner.features.admin.category.data.source.CategoryManagementApi
 import com.daily.nexamartpartner.features.admin.category.data.source.CategoryManagementRemoteDataSource
@@ -167,8 +167,8 @@ class AppContainer(context: Context) {
     private val adminDashboardContract: AdminDashboardContract = PendingBackendAdminDashboardContract()
     private val adminOrdersContract: AdminOrdersContract = PendingBackendAdminOrdersContract()
     private val deliveryPartnerContract: DeliveryPartnerContract = PendingBackendDeliveryPartnerContract()
-    private val productManagementContract: ProductManagementContract = PendingBackendProductManagementContract()
-    private val categoryManagementContract: CategoryManagementContract = PendingBackendCategoryManagementContract()
+    private val productManagementContract: ProductManagementContract = BackendProductManagementContract()
+    private val categoryManagementContract: CategoryManagementContract = BackendCategoryManagementContract()
     private val customerManagementContract: CustomerManagementContract = PendingBackendCustomerManagementContract()
     private val deliveryDashboardContract: DeliveryDashboardContract = PendingBackendDeliveryDashboardContract()
     private val deliveryOrderWorkflowContract: DeliveryOrderWorkflowContract = PendingBackendDeliveryOrderWorkflowContract()

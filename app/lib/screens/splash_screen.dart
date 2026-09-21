@@ -12,10 +12,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _navigationTimer;
+
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(milliseconds: 1100), () {
+    _navigationTimer = Timer(const Duration(milliseconds: 1100), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -26,6 +28,12 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    _navigationTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff3454d1),
@@ -33,22 +41,18 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 92,
-              height: 92,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: const Icon(
-                Icons.shopping_bag_rounded,
-                size: 52,
-                color: Color(0xff3454d1),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: Image.asset(
+                'assets/images/vjoykart_icon.png',
+                width: 108,
+                height: 108,
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 22),
             const Text(
-              'NexaMart',
+              'VJoyKart',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 34,

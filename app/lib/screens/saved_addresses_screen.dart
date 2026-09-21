@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/address.dart';
 import '../providers/address_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SavedAddressesScreen extends StatelessWidget {
   const SavedAddressesScreen({super.key});
@@ -129,6 +130,14 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     state = TextEditingController(text: a?.state ?? 'Telangana');
     pincode = TextEditingController(text: a?.pincode ?? '');
     isDefault = a?.isDefault ?? false;
+    if (a == null) _prefillCustomerPhone();
+  }
+
+  Future<void> _prefillCustomerPhone() async {
+    final prefs = await SharedPreferences.getInstance();
+    final customerPhone = prefs.getString('vk.customerPhone');
+    if (!mounted || customerPhone == null || customerPhone.isEmpty) return;
+    if (mobile.text.isEmpty) mobile.text = customerPhone;
   }
 
   @override
