@@ -144,6 +144,11 @@
     <string name="admin_product_form_sku_hint">SKU (optional)</string>
     <string name="admin_product_form_unit_hint">Unit (optional)</string>
     <string name="admin_product_form_image_url_hint">Product image URL (optional)</string>
+    <string name="admin_product_form_photo_title">Product photo</string>
+    <string name="admin_product_form_photo_content_description">Product photo preview</string>
+    <string name="admin_product_form_select_photo">Choose photo</string>
+    <string name="admin_product_form_remove_photo">Remove</string>
+    <string name="admin_product_form_no_photo">No new photo selected</string>
     <string name="admin_product_form_save">Save Product</string>
     <string name="admin_product_form_categories_unavailable">Category options are unavailable until the backend category lookup contract is confirmed.</string>
     <string name="admin_product_form_unsaved_title">Discard changes?</string>

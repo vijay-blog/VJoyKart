@@ -5,7 +5,9 @@ import java.math.BigDecimal
 data class AdminDashboard(
     val kpis: DashboardKpis?,
     val recentOrders: List<RecentOrderSummary>,
-    val recentOrdersAvailable: Boolean
+    val recentOrdersAvailable: Boolean,
+    val unreadNotifications: Long = 0L,
+    val notifications: List<AdminNotification> = emptyList()
 ) {
     val hasData: Boolean
         get() = kpis != null || recentOrders.isNotEmpty()
@@ -28,4 +30,14 @@ data class RecentOrderSummary(
     val currencyCode: String?,
     val status: String,
     val createdAt: String?
+)
+
+
+data class AdminNotification(
+    val id: String,
+    val title: String,
+    val message: String,
+    val createdAt: String?,
+    val read: Boolean,
+    val orderId: Long?
 )

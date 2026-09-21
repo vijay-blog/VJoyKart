@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -91,6 +93,15 @@ public class AdminCatalogController {
   @PatchMapping("/products/{id}")
   ProductResponse updateProduct(@PathVariable Long id, @RequestBody Map<String, Object> body) {
     return catalogService.updateProduct(id, body);
+  }
+
+
+  @PostMapping("/products/{id}/image")
+  ProductResponse uploadProductImage(
+      @PathVariable Long id,
+      @RequestPart("image") MultipartFile image
+  ) {
+    return catalogService.uploadProductImage(id, image);
   }
 
   @PatchMapping("/products/{id}/actions")

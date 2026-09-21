@@ -12,6 +12,7 @@ import com.nexamart.backend.domain.Product;
 import com.nexamart.backend.exception.ApiException;
 import com.nexamart.backend.repository.CategoryRepository;
 import com.nexamart.backend.repository.ProductRepository;
+import com.nexamart.backend.repository.ProductImageRepository;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -28,13 +29,14 @@ import org.springframework.data.domain.Pageable;
 class CatalogServiceTest {
   @Mock CategoryRepository categories;
   @Mock ProductRepository products;
+  @Mock ProductImageRepository productImages;
   @Mock MappingService mapper;
 
   private CatalogService service;
 
   @BeforeEach
   void setUp() {
-    service = new CatalogService(categories, products, mapper);
+    service = new CatalogService(categories, products, productImages, mapper);
   }
 
   @Test

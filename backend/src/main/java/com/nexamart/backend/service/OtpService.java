@@ -26,6 +26,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.Locale;
 
 @Service
 public class OtpService {
@@ -134,25 +135,87 @@ public class OtpService {
         String apiKey = properties.getOtpApiKey();
         if (apiKey == null || apiKey.isBlank()) {
             if (properties.isOtpDevMode()) return;
-            throw new IllegalStateException("OTP API key is missing");
+            throw new IllegalStateException("TWOFACTOR_API_KEY is not configured");
         }
+
+        Exception modernFailure = null;
+        try {
+            sendSmsUsingCurrentApi(apiKey, phone, otp);
+            return;
+        } catch (Exception ex) {
+            modernFailure = ex;
+        }
+
+        // Backward-compatible fallback for accounts still using the original
+        // 2Factor manual OTP endpoint.
+        try {
+            sendSmsUsingLegacyApi(apiKey, phone, otp);
+        } catch (Exception legacyFailure) {
+            if (modernFailure != null) legacyFailure.addSuppressed(modernFailure);
+            throw legacyFailure;
+        }
+    }
+
+    private void sendSmsUsingCurrentApi(String apiKey, String phone, String otp) throws Exception {
+        StringBuilder json = new StringBuilder()
+                .append("{\"to\":\"+91").append(phone)
+                .append("\"");
+        if (properties.getOtpTemplateName() != null && !properties.getOtpTemplateName().isBlank()) {
+            json.append(",\"template_name\":\"")
+                    .append(jsonEscape(properties.getOtpTemplateName()))
+                    .append("\"");
+        }
+        json.append(",\"var1\":\"").append(otp).append("\"}");
+
+        HttpRequest request = HttpRequest.newBuilder(
+                URI.create("https://2factor.in/API/V1/OTP/SEND"))
+                .timeout(Duration.ofSeconds(12))
+                .header("X-API-Key", apiKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json.toString(), StandardCharsets.UTF_8))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        String body = response.body() == null ? "" : response.body().trim();
+        String normalized = body.toLowerCase(Locale.ROOT);
+        if (response.statusCode() < 200 || response.statusCode() >= 300 ||
+                !(normalized.contains("\"status\":\"sent\"")
+                        || normalized.contains("\"status\": \"sent\"")
+                        || normalized.contains("\"status\":\"success\"")
+                        || normalized.contains("\"status\": \"success\""))) {
+            throw new IllegalStateException("2Factor current OTP API rejected request: HTTP "
+                    + response.statusCode());
+        }
+    }
+
+    private void sendSmsUsingLegacyApi(String apiKey, String phone, String otp) throws Exception {
         String encodedKey = enc(apiKey);
-        String encodedPhone = enc(phone);
+        String encodedPhone = enc("91" + phone);
         String encodedOtp = enc(otp);
         StringBuilder url = new StringBuilder("https://2factor.in/API/V1/")
                 .append(encodedKey).append("/SMS/").append(encodedPhone).append('/').append(encodedOtp);
         if (properties.getOtpTemplateName() != null && !properties.getOtpTemplateName().isBlank()) {
             url.append('/').append(enc(properties.getOtpTemplateName()));
         }
+
         HttpRequest request = HttpRequest.newBuilder(URI.create(url.toString()))
                 .timeout(Duration.ofSeconds(12))
                 .GET()
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        String body = response.body() == null ? "" : response.body().trim();
+        String normalized = body.toLowerCase(Locale.ROOT);
         if (response.statusCode() < 200 || response.statusCode() >= 300 ||
-                !response.body().toLowerCase().contains("success")) {
-            throw new IllegalStateException("SMS provider rejected OTP request");
+                !(normalized.contains("\"status\":\"success\"")
+                        || normalized.contains("\"status\": \"success\"")
+                        || normalized.contains("\"status\":success"))) {
+            throw new IllegalStateException("2Factor legacy OTP API rejected request: HTTP "
+                    + response.statusCode());
         }
+    }
+
+    private String jsonEscape(String value) {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     private String normalizePhone(String rawPhone) {

@@ -1,6 +1,7 @@
 package com.daily.nexamartpartner.features.admin.presentation.ui
 
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import com.daily.nexamartpartner.databinding.FragmentAdminDashboardBinding
 import com.daily.nexamartpartner.databinding.ViewDashboardKpiCardBinding
 import com.daily.nexamartpartner.di.appContainer
 import com.daily.nexamartpartner.features.admin.domain.model.DashboardKpis
+import com.daily.nexamartpartner.features.admin.domain.model.AdminNotification
 import com.daily.nexamartpartner.features.admin.presentation.state.AdminDashboardUiState
 import com.daily.nexamartpartner.features.admin.presentation.viewmodel.AdminDashboardViewModel
 import com.daily.nexamartpartner.features.admin.presentation.viewmodel.AdminDashboardViewModelFactory
@@ -46,6 +48,8 @@ class AdminDashboardScreen : Fragment(R.layout.fragment_admin_dashboard) {
     }
 
     private val recentOrderAdapter = OrderSummaryAdapter()
+    private var latestNotifications: List<AdminNotification> = emptyList()
+    private var unreadNotificationCount: Long = 0L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,6 +71,8 @@ class AdminDashboardScreen : Fragment(R.layout.fragment_admin_dashboard) {
     }
 
     private fun setupHeaderActions(navigator: ProtectedNavigator) {
+        binding.notificationButton.isEnabled = true
+        binding.notificationButton.setOnClickListener { showNotifications() }
         binding.settingsButton.setOnClickListener {
             navigator.navigate(R.id.adminSettingsFragment)
         }
@@ -148,6 +154,9 @@ class AdminDashboardScreen : Fragment(R.layout.fragment_admin_dashboard) {
                 binding.dashboardContentSection.isVisible = false
                 binding.dashboardStateCard.isVisible = false
                 binding.retryButton.isVisible = false
+                binding.notificationButton.isEnabled = false
+                latestNotifications = emptyList()
+                unreadNotificationCount = 0L
             }
 
             is AdminDashboardUiState.ContentState.Success -> {
@@ -160,6 +169,15 @@ class AdminDashboardScreen : Fragment(R.layout.fragment_admin_dashboard) {
                     hasOrders = content.dashboard.recentOrders.isNotEmpty()
                 )
                 recentOrderAdapter.submitList(content.dashboard.recentOrders)
+                latestNotifications = content.dashboard.notifications
+                unreadNotificationCount = content.dashboard.unreadNotifications
+                binding.notificationButton.isEnabled = true
+                binding.notificationButton.contentDescription =
+                    if (unreadNotificationCount > 0) {
+                        "Notifications ($unreadNotificationCount unread)"
+                    } else {
+                        "Notifications"
+                    }
             }
 
             is AdminDashboardUiState.ContentState.Empty -> {
@@ -172,6 +190,9 @@ class AdminDashboardScreen : Fragment(R.layout.fragment_admin_dashboard) {
                 renderKpis(null)
                 renderRecentOrders(recentOrdersAvailable = true, hasOrders = false)
                 recentOrderAdapter.submitList(emptyList())
+                latestNotifications = emptyList()
+                unreadNotificationCount = 0L
+                binding.notificationButton.isEnabled = true
             }
 
             is AdminDashboardUiState.ContentState.Error -> {
@@ -184,6 +205,9 @@ class AdminDashboardScreen : Fragment(R.layout.fragment_admin_dashboard) {
                 renderKpis(null)
                 renderRecentOrders(recentOrdersAvailable = false, hasOrders = false)
                 recentOrderAdapter.submitList(emptyList())
+                latestNotifications = emptyList()
+                unreadNotificationCount = 0L
+                binding.notificationButton.isEnabled = true
             }
 
             is AdminDashboardUiState.ContentState.Unavailable -> {
@@ -196,8 +220,41 @@ class AdminDashboardScreen : Fragment(R.layout.fragment_admin_dashboard) {
                 renderKpis(null)
                 renderRecentOrders(recentOrdersAvailable = false, hasOrders = false)
                 recentOrderAdapter.submitList(emptyList())
+                latestNotifications = emptyList()
+                unreadNotificationCount = 0L
+                binding.notificationButton.isEnabled = true
             }
         }
+    }
+
+    private fun showNotifications() {
+        if (latestNotifications.isEmpty()) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Notifications")
+                .setMessage("No notifications yet.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        val message = latestNotifications.joinToString("\n\n") { n ->
+            val order = n.orderId?.let { "Order #$it" } ?: ""
+            listOf(n.title, n.message, order, n.createdAt.orEmpty())
+                .filter { it.isNotBlank() }
+                .joinToString("\n")
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(
+                if (unreadNotificationCount > 0) {
+                    "Notifications ($unreadNotificationCount unread)"
+                } else {
+                    "Notifications"
+                }
+            )
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     private fun renderKpis(kpis: DashboardKpis?) {

@@ -34,7 +34,8 @@ public final class ApiModels{private ApiModels(){}
  public record DeliveryPartnerResponse(String partnerId,String name,String phone,String email,String profileImageUrl,String accountStatus,String verificationStatus,String availability,String workState,String registeredAt,String lastActiveAt,String vehicleType,String vehicleNumber,String licenseReference,DeliveryPartnerStatistics statistics,List<PartnerOrderSummary> currentOrders,List<PartnerOrderSummary> recentHistory,Boolean isAssignable,List<String> allowedActions){}
  public record DeliveryPartnerStatistics(Long totalDeliveries,Long completedDeliveries,Long cancelledDeliveries,Long activeDeliveries){}
  public record PartnerOrderSummary(String orderId,String status,String timestamp){}
- public record DashboardResponse(Long totalOrders,Long todayOrders,Long pendingOrders,Long outForDelivery,Long deliveredToday,Double todaySales,String currencyCode,List<AdminRecentOrder> recentOrders){}
+ public record AdminNotificationResponse(String id,String title,String message,Instant createdAt,boolean read,Long orderId){}
+ public record DashboardResponse(Long totalOrders,Long todayOrders,Long pendingOrders,Long outForDelivery,Long deliveredToday,Double todaySales,String currencyCode,List<AdminRecentOrder> recentOrders,long unreadNotifications,List<AdminNotificationResponse> notifications){}
  public record AvailabilityResponse(boolean available,String status,boolean canChange,String reason,Instant updatedAt){}
  public record ProfileResponse(Long id,String name,String phone,String email,String profileImageUrl,String verificationStatus,String accountStatus,String vehicleType,String vehicleNumber,String licenseReference,Instant registeredAt,Instant lastActiveAt,List<String> editableFields){}
  public record NotificationResponse(String id,String title,String message,Instant createdAt,boolean read,String type,Long orderId,String actionUrl){}

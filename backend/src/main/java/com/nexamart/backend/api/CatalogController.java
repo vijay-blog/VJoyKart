@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/v1/catalog")
@@ -41,5 +44,16 @@ public class CatalogController {
   @GetMapping("/products/{id}")
   ProductResponse product(@PathVariable Long id) {
     return catalogService.customerProductDetail(id);
+  }
+
+
+  @GetMapping("/products/{id}/image")
+  ResponseEntity<byte[]> productImage(@PathVariable Long id) {
+    return catalogService.productImage(id)
+        .map(image -> ResponseEntity.ok()
+            .cacheControl(CacheControl.noCache())
+            .contentType(MediaType.parseMediaType(image.getContentType()))
+            .body(image.getImageData()))
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }

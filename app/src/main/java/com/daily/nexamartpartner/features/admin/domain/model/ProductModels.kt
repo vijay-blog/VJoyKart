@@ -134,3 +134,9 @@ data class ProductDraft(
     val unit: String? = null,
     val imageUrl: String? = null
 )
+
+data class ProductImageUpload(
+    val bytes: ByteArray,
+    val fileName: String,
+    val contentType: String
+)

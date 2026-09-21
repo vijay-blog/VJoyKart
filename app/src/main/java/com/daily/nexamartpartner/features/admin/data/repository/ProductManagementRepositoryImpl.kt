@@ -15,6 +15,7 @@ import com.daily.nexamartpartner.features.admin.domain.model.ProductAvailability
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDetails
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDraft
 import com.daily.nexamartpartner.features.admin.domain.model.ProductFilters
+import com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
 import com.daily.nexamartpartner.features.admin.domain.model.ProductSort
 import com.daily.nexamartpartner.features.admin.domain.model.ProductStatus
 import com.daily.nexamartpartner.features.admin.domain.model.ProductSummary
@@ -56,6 +57,18 @@ class ProductManagementRepositoryImpl(
 
     override suspend fun updateProduct(productId: String, draft: ProductDraft): AppResult<ProductDetails> {
         return when (val result = remoteDataSource.updateProduct(productId, draft)) {
+            is AppResult.Success -> mapProductDetails(result.data)
+            is AppResult.Failure -> result
+        }
+    }
+
+
+
+    override suspend fun uploadProductImage(
+        productId: String,
+        image: ProductImageUpload
+    ): AppResult<ProductDetails> {
+        return when (val result = remoteDataSource.uploadProductImage(productId, image)) {
             is AppResult.Success -> mapProductDetails(result.data)
             is AppResult.Failure -> result
         }

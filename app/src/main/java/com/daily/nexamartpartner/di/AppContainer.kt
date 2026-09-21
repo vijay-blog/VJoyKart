@@ -121,6 +121,7 @@ import com.daily.nexamartpartner.features.admin.domain.usecase.GetProductsUseCas
 import com.daily.nexamartpartner.features.admin.domain.usecase.PerformProductAdminActionUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.UpdateDeliveryPartnerUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.UpdateProductUseCase
+import com.daily.nexamartpartner.features.admin.domain.usecase.UploadProductImageUseCase
 import com.daily.nexamartpartner.features.auth.data.contract.AuthRequestContract
 import com.daily.nexamartpartner.features.auth.data.contract.ConfigurableAuthRequestContract
 import com.daily.nexamartpartner.features.auth.data.repository.AuthRepositoryImpl
@@ -325,6 +326,10 @@ class AppContainer(context: Context) {
 
     fun provideUpdateProductUseCase(): UpdateProductUseCase =
         UpdateProductUseCase(productManagementRepositoryOverride ?: productManagementRepository)
+
+
+    fun provideUploadProductImageUseCase(): UploadProductImageUseCase =
+        UploadProductImageUseCase(productManagementRepositoryOverride ?: productManagementRepository)
 
     fun providePerformProductAdminActionUseCase(): PerformProductAdminActionUseCase =
         PerformProductAdminActionUseCase(productManagementRepositoryOverride ?: productManagementRepository)

@@ -9,6 +9,7 @@ import com.daily.nexamartpartner.features.admin.domain.model.ProductAdminAction
 import com.daily.nexamartpartner.features.admin.domain.model.ProductAvailability
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDetails
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDraft
+import com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
 import com.daily.nexamartpartner.features.admin.domain.model.ProductFilters
 import com.daily.nexamartpartner.features.admin.domain.model.ProductStatus
 import com.daily.nexamartpartner.features.admin.domain.model.ProductSummary
@@ -20,6 +21,7 @@ import com.daily.nexamartpartner.features.admin.domain.usecase.GetProductDetails
 import com.daily.nexamartpartner.features.admin.domain.usecase.GetProductsUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.PerformProductAdminActionUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.UpdateProductUseCase
+import com.daily.nexamartpartner.features.admin.domain.usecase.UploadProductImageUseCase
 import com.daily.nexamartpartner.features.admin.presentation.state.ProductDetailsUiState
 import com.daily.nexamartpartner.features.admin.presentation.state.ProductFormUiState
 import com.daily.nexamartpartner.features.admin.presentation.state.ProductListUiState
@@ -269,7 +271,8 @@ class ProductViewModelTest {
             null,
             GetProductCategoryOptionsUseCase(repo),
             CreateProductUseCase(repo),
-            UpdateProductUseCase(repo)
+            UpdateProductUseCase(repo),
+            UploadProductImageUseCase(repo)
         )
         advanceUntilIdle()
         vm.save()
@@ -290,7 +293,8 @@ class ProductViewModelTest {
             null,
             GetProductCategoryOptionsUseCase(repo),
             CreateProductUseCase(repo),
-            UpdateProductUseCase(repo)
+            UpdateProductUseCase(repo),
+            UploadProductImageUseCase(repo)
         )
         advanceUntilIdle()
         vm.onNameChanged("Rice")
@@ -318,7 +322,8 @@ class ProductViewModelTest {
             null,
             GetProductCategoryOptionsUseCase(repo),
             CreateProductUseCase(repo),
-            UpdateProductUseCase(repo)
+            UpdateProductUseCase(repo),
+            UploadProductImageUseCase(repo)
         )
         advanceUntilIdle()
         vm.onNameChanged("Rice")
@@ -343,7 +348,8 @@ class ProductViewModelTest {
             null,
             GetProductCategoryOptionsUseCase(repo),
             CreateProductUseCase(repo),
-            UpdateProductUseCase(repo)
+            UpdateProductUseCase(repo),
+            UploadProductImageUseCase(repo)
         )
         advanceUntilIdle()
         vm.onNameChanged("Rice")
@@ -368,7 +374,8 @@ class ProductViewModelTest {
             GetProductDetailsUseCase(repo),
             GetProductCategoryOptionsUseCase(repo),
             CreateProductUseCase(repo),
-            UpdateProductUseCase(repo)
+            UpdateProductUseCase(repo),
+            UploadProductImageUseCase(repo)
         )
         advanceUntilIdle()
         assertEquals("Rice 5kg", vm.uiState.value.name)
@@ -389,7 +396,8 @@ class ProductViewModelTest {
             GetProductDetailsUseCase(repo),
             GetProductCategoryOptionsUseCase(repo),
             CreateProductUseCase(repo),
-            UpdateProductUseCase(repo)
+            UpdateProductUseCase(repo),
+            UploadProductImageUseCase(repo)
         )
         advanceUntilIdle()
         vm.onNameChanged("My unsaved name")
@@ -491,6 +499,32 @@ class ProductViewModelTest {
 
         override suspend fun updateProduct(productId: String, draft: ProductDraft): AppResult<ProductDetails> =
             updateResult
+
+        override suspend fun uploadProductImage(
+            productId: String,
+            image: ProductImageUpload
+        ): AppResult<ProductDetails> = AppResult.Success(
+            ProductDetails(
+                productId = productId,
+                name = "Rice 5kg",
+                description = null,
+                categoryId = "C1",
+                categoryName = "Groceries",
+                price = java.math.BigDecimal("45"),
+                discountedPrice = java.math.BigDecimal("45"),
+                discountPercent = java.math.BigDecimal.ZERO,
+                currencyCode = "INR",
+                stock = 10,
+                sku = null,
+                unit = "kg",
+                status = ProductStatus.ACTIVE,
+                availability = ProductAvailability.IN_STOCK,
+                imageUrl = "/api/v1/catalog/products/$productId/image",
+                createdAt = null,
+                updatedAt = null,
+                allowedActions = emptyList()
+            )
+        )
 
         override suspend fun performProductAction(productId: String, action: ProductAdminAction): AppResult<Unit> {
             if (actionDelayMs > 0) delay(actionDelayMs)

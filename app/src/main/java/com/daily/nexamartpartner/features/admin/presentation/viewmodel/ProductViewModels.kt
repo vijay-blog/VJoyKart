@@ -9,6 +9,7 @@ import com.daily.nexamartpartner.features.admin.domain.model.CategoryOption
 import com.daily.nexamartpartner.features.admin.domain.model.PagedProducts
 import com.daily.nexamartpartner.features.admin.domain.model.ProductAdminAction
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDraft
+import com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
 import com.daily.nexamartpartner.features.admin.domain.model.ProductFilters
 import com.daily.nexamartpartner.features.admin.domain.model.ProductSort
 import com.daily.nexamartpartner.features.admin.domain.model.ProductSummary
@@ -19,6 +20,7 @@ import com.daily.nexamartpartner.features.admin.domain.usecase.GetProductDetails
 import com.daily.nexamartpartner.features.admin.domain.usecase.GetProductsUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.PerformProductAdminActionUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.UpdateProductUseCase
+import com.daily.nexamartpartner.features.admin.domain.usecase.UploadProductImageUseCase
 import com.daily.nexamartpartner.features.admin.presentation.state.ProductDetailsUiState
 import com.daily.nexamartpartner.features.admin.presentation.state.ProductFormUiState
 import com.daily.nexamartpartner.features.admin.presentation.state.ProductListUiState
@@ -278,7 +280,8 @@ class ProductFormViewModel(
     private val getProductDetails: GetProductDetailsUseCase?,
     private val getCategoryOptions: GetProductCategoryOptionsUseCase,
     private val createProduct: CreateProductUseCase,
-    private val updateProduct: UpdateProductUseCase
+    private val updateProduct: UpdateProductUseCase,
+    private val uploadProductImage: UploadProductImageUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductFormUiState(mode = mode))
     val uiState: StateFlow<ProductFormUiState> = _uiState.asStateFlow()
@@ -287,6 +290,8 @@ class ProductFormViewModel(
     val events: SharedFlow<ProductEvent> = _events.asSharedFlow()
 
     private var loadJob: Job? = null
+    private var selectedImage: ProductImageUpload? = null
+    private var persistedCreateProductId: String? = null
 
     init {
         loadCategoryOptions()
@@ -341,6 +346,16 @@ class ProductFormViewModel(
         _uiState.update { it.copy(imageUrl = value, isDirty = true) }
     }
 
+    fun onImageSelected(image: ProductImageUpload) {
+        selectedImage = image
+        _uiState.update { it.copy(isDirty = true, imageFileName = image.fileName) }
+    }
+
+    fun onImageSelectionCleared() {
+        selectedImage = null
+        _uiState.update { it.copy(isDirty = true, imageFileName = null) }
+    }
+
     fun hasUnsavedChanges(): Boolean = _uiState.value.isDirty
 
     fun retry() {
@@ -351,6 +366,18 @@ class ProductFormViewModel(
     fun save() {
         val state = _uiState.value
         if (state.isSaving) return
+
+        val existingCreatedId = persistedCreateProductId
+        if (mode == ProductFormUiState.Mode.CREATE && existingCreatedId != null) {
+            if (selectedImage != null) {
+                uploadOnly(existingCreatedId, selectedImage!!)
+            } else {
+                _uiState.update { it.copy(isSaving = false, isDirty = false) }
+                _events.tryEmit(ProductEvent.SavedSuccessfully)
+            }
+            return
+        }
+
         val errors = validate(state)
         if (!errors.isEmpty()) {
             _uiState.update { it.copy(fieldErrors = errors) }
@@ -376,10 +403,33 @@ class ProductFormViewModel(
             } else {
                 updateProduct(requireNotNull(productId), draft)
             }
+
             when (result) {
                 is AppResult.Success -> {
-                    _uiState.update { it.copy(isSaving = false, isDirty = false) }
-                    _events.tryEmit(ProductEvent.SavedSuccessfully)
+                    val saved = result.data
+                    val image = selectedImage
+                    if (image != null) {
+                        when (val upload = uploadProductImage(saved.productId, image)) {
+                            is AppResult.Success -> {
+                                _uiState.update { it.copy(isSaving = false, isDirty = false) }
+                                _events.tryEmit(ProductEvent.SavedSuccessfully)
+                            }
+                            is AppResult.Failure -> {
+                                if (mode == ProductFormUiState.Mode.CREATE) {
+                                    persistedCreateProductId = saved.productId
+                                }
+                                _uiState.update { it.copy(isSaving = false) }
+                                _events.tryEmit(
+                                    ProductEvent.Message(
+                                        "Product saved, but photo upload failed: ${upload.error.message}"
+                                    )
+                                )
+                            }
+                        }
+                    } else {
+                        _uiState.update { it.copy(isSaving = false, isDirty = false) }
+                        _events.tryEmit(ProductEvent.SavedSuccessfully)
+                    }
                 }
 
                 is AppResult.Failure -> {
@@ -393,10 +443,25 @@ class ProductFormViewModel(
                                 it.copy(content = ProductFormUiState.Content.Unavailable(result.error.message))
                             }
 
-                        else -> {
-                            _events.tryEmit(ProductEvent.Message(result.error.message))
-                        }
+                        else -> _events.tryEmit(ProductEvent.Message(result.error.message))
                     }
+                }
+            }
+        }
+    }
+
+    private fun uploadOnly(productId: String, image: ProductImageUpload) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true) }
+            when (val upload = uploadProductImage(productId, image)) {
+                is AppResult.Success -> {
+                    persistedCreateProductId = null
+                    _uiState.update { it.copy(isSaving = false, isDirty = false) }
+                    _events.tryEmit(ProductEvent.SavedSuccessfully)
+                }
+                is AppResult.Failure -> {
+                    _uiState.update { it.copy(isSaving = false) }
+                    _events.tryEmit(ProductEvent.Message("Photo upload failed: ${upload.error.message}"))
                 }
             }
         }

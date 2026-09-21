@@ -9,14 +9,17 @@ import com.nexamart.backend.domain.Product;
 import com.nexamart.backend.exception.ApiException;
 import com.nexamart.backend.repository.CategoryRepository;
 import com.nexamart.backend.repository.ProductRepository;
+import com.nexamart.backend.repository.ProductImageRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +27,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CatalogService {
   private final CategoryRepository categories;
   private final ProductRepository products;
+  private final ProductImageRepository productImages;
   private final MappingService mapper;
 
   public CatalogService(
       CategoryRepository categories,
       ProductRepository products,
+      ProductImageRepository productImages,
       MappingService mapper
   ) {
     this.categories = categories;
     this.products = products;
+    this.productImages = productImages;
     this.mapper = mapper;
   }
 
@@ -155,6 +161,42 @@ public class CatalogService {
 
   public ProductResponse productDetail(Long id) {
     return mapper.product(product(id));
+  }
+
+
+  @Transactional
+  public ProductResponse uploadProductImage(Long id, MultipartFile file) {
+    Product product = product(id);
+    if (file == null || file.isEmpty()) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Product photo is required.");
+    }
+    if (file.getSize() > 5L * 1024L * 1024L) {
+      throw new ApiException(HttpStatus.PAYLOAD_TOO_LARGE, "Product photo must be 5 MB or smaller.");
+    }
+    String contentType = file.getContentType();
+    if (contentType == null || !List.of("image/jpeg", "image/png", "image/webp").contains(contentType.toLowerCase())) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Only JPG, PNG, or WebP product photos are supported.");
+    }
+    try {
+      ProductImage image = productImages.findById(id).orElseGet(ProductImage::new);
+      image.setProduct(product);
+      image.setImageData(file.getBytes());
+      image.setContentType(contentType);
+      image.touch();
+      productImages.save(image);
+
+      product.setImageUrl("/api/v1/catalog/products/" + id + "/image");
+      product.touch();
+      products.save(product);
+      return mapper.product(product);
+    } catch (java.io.IOException ex) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Unable to read the product photo.");
+    }
+  }
+
+  @Transactional(readOnly = true)
+  public Optional<ProductImage> productImage(Long id) {
+    return productImages.findById(id);
   }
 
   @Transactional

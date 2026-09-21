@@ -11,6 +11,7 @@ interface ProductManagementContract {
     val categoryOptionsPath: String?
     val createProductPath: String?
     val updateProductPathTemplate: String?
+    val productImagePathTemplate: String?
     val productActionPathTemplate: String?
 
     fun buildProductListQuery(query: ProductsQuery): Map<String, String>?
@@ -26,6 +27,7 @@ class BackendProductManagementContract : ProductManagementContract {
     override val categoryOptionsPath = "admin/catalog/categories/options"
     override val createProductPath = "admin/catalog/products"
     override val updateProductPathTemplate = "admin/catalog/products/{id}"
+    override val productImagePathTemplate = "admin/catalog/products/{id}/image"
     override val productActionPathTemplate = "admin/catalog/products/{id}/actions"
 
     override fun buildProductListQuery(query: ProductsQuery): Map<String, String> = buildMap {
