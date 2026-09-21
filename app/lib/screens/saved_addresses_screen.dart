@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../models/address.dart';
 import '../providers/address_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class SavedAddressesScreen extends StatelessWidget {
   const SavedAddressesScreen({super.key});
@@ -116,6 +118,9 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
   late final TextEditingController state;
   late final TextEditingController pincode;
   bool isDefault = false;
+  bool locating = false;
+  double? _latitude;
+  double? _longitude;
 
   @override
   void initState() {
@@ -130,6 +135,8 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     state = TextEditingController(text: a?.state ?? 'Telangana');
     pincode = TextEditingController(text: a?.pincode ?? '');
     isDefault = a?.isDefault ?? false;
+    _latitude = a?.latitude;
+    _longitude = a?.longitude;
     if (a == null) _prefillCustomerPhone();
   }
 
@@ -160,6 +167,8 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            _locationCard(),
+            const SizedBox(height: 12),
             _field('Full Name', name),
             _field('Mobile', mobile,
                 keyboardType: TextInputType.phone,
@@ -193,6 +202,173 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     );
   }
 
+  Widget _locationCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xffe9edff),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            backgroundColor: Color(0xff3454d1),
+            child: Icon(Icons.my_location, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Use current location',
+                    style: TextStyle(fontWeight: FontWeight.w900)),
+                SizedBox(height: 3),
+                Text('Automatically fill area, city, state and pincode'),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          FilledButton.tonal(
+            onPressed: locating ? null : _useCurrentLocation,
+            child: locating
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Detect'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _useCurrentLocation() async {
+    if (locating) return;
+    setState(() => locating = true);
+    try {
+      final enabled = await Geolocator.isLocationServiceEnabled();
+      if (!enabled) {
+        throw const LocationServiceDisabledException();
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        throw const PermissionDeniedException('Location permission denied.');
+      }
+      if (permission == LocationPermission.deniedForever) {
+        throw const PermissionDeniedException(
+          'Location permission is permanently denied. Enable it in Settings.',
+        );
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      // Store the coordinates immediately. Reverse geocoding fills the
+      // human-readable address fields when the device geocoder is available.
+      var nextLatitude = position.latitude;
+      var nextLongitude = position.longitude;
+
+      try {
+        final placemarks = await Geocoding().placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          final detectedStreet = [
+            p.subThoroughfare,
+            p.thoroughfare,
+          ].where((x) => x != null && x.trim().isNotEmpty).join(' ').trim();
+
+          final detectedArea = [
+            p.subLocality,
+            p.locality,
+            p.subAdministrativeArea,
+          ].firstWhere(
+            (x) => x != null && x.trim().isNotEmpty,
+            orElse: () => '',
+          );
+
+          final detectedCity = [
+            p.locality,
+            p.subAdministrativeArea,
+            p.administrativeArea,
+          ].firstWhere(
+            (x) => x != null && x.trim().isNotEmpty,
+            orElse: () => city.text,
+          );
+
+          final detectedState = p.administrativeArea?.trim();
+          final detectedPincode = p.postalCode?.trim();
+
+          if (detectedStreet.isNotEmpty && house.text.trim().isEmpty) {
+            house.text = detectedStreet;
+          }
+          if (detectedArea != null && detectedArea.trim().isNotEmpty) {
+            area.text = detectedArea.trim();
+          }
+          if (detectedCity != null && detectedCity.trim().isNotEmpty) {
+            city.text = detectedCity.trim();
+          }
+          if (detectedState != null && detectedState.isNotEmpty) {
+            state.text = detectedState;
+          }
+          if (detectedPincode != null && detectedPincode.isNotEmpty) {
+            pincode.text = detectedPincode;
+          }
+        }
+      } catch (_) {
+        // GPS coordinates are still retained even if reverse geocoding fails.
+      }
+
+      // Keep the coordinates so they are persisted with the saved address
+      // and sent to the order backend.
+      _latitude = nextLatitude;
+      _longitude = nextLongitude;
+
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Current location detected (${nextLatitude.toStringAsFixed(5)}, '
+            '${nextLongitude.toStringAsFixed(5)}). Please review the address.',
+          ),
+        ),
+      );
+    } on LocationServiceDisabledException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Please turn on Location/GPS and try again.'),
+        ));
+      }
+    } on PermissionDeniedException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location permission is required.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to detect your location. Please try again.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => locating = false);
+    }
+  }
+
   Widget _field(String label, TextEditingController controller,
       {TextInputType keyboardType = TextInputType.text,
       String? Function(String?)? validator}) {
@@ -222,6 +398,8 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
       state: state.text.trim(),
       pincode: pincode.text.trim(),
       country: 'India',
+      latitude: _latitude,
+      longitude: _longitude,
       isDefault: isDefault,
     );
     await context.read<AddressProvider>().save(item);

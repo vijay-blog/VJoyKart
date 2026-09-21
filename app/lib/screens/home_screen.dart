@@ -14,13 +14,22 @@ import 'orders_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int initialIndex;
+
+  const HomeScreen({super.key, this.initialIndex = 0});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int index = 0;
+  late int index;
+
+  @override
+  void initState() {
+    super.initState();
+    index = widget.initialIndex.clamp(0, 4).toInt();
+  }
   @override
   Widget build(BuildContext c) {
     final cart = c.watch<CartProvider>();

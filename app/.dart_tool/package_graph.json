@@ -9,6 +9,8 @@
       "dependencies": [
         "cupertino_icons",
         "flutter",
+        "geocoding",
+        "geolocator",
         "http",
         "intl",
         "provider",
@@ -43,6 +45,28 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "geocoding",
+      "version": "5.0.0",
+      "dependencies": [
+        "flutter",
+        "geocoding_android",
+        "geocoding_darwin",
+        "geocoding_platform_interface"
+      ]
+    },
+    {
+      "name": "geolocator",
+      "version": "13.0.4",
+      "dependencies": [
+        "flutter",
+        "geolocator_android",
+        "geolocator_apple",
+        "geolocator_platform_interface",
+        "geolocator_web",
+        "geolocator_windows"
       ]
     },
     {
@@ -198,6 +222,61 @@
         "stream_channel",
         "string_scanner",
         "term_glyph"
+      ]
+    },
+    {
+      "name": "geocoding_platform_interface",
+      "version": "5.0.0",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "geolocator_windows",
+      "version": "0.2.5",
+      "dependencies": [
+        "flutter",
+        "geolocator_platform_interface"
+      ]
+    },
+    {
+      "name": "geolocator_web",
+      "version": "4.1.4",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "geolocator_platform_interface",
+        "web"
+      ]
+    },
+    {
+      "name": "geolocator_apple",
+      "version": "2.3.14",
+      "dependencies": [
+        "flutter",
+        "geolocator_platform_interface"
+      ]
+    },
+    {
+      "name": "geolocator_android",
+      "version": "4.6.2",
+      "dependencies": [
+        "flutter",
+        "geolocator_platform_interface",
+        "meta",
+        "uuid"
+      ]
+    },
+    {
+      "name": "geolocator_platform_interface",
+      "version": "4.3.0",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "plugin_platform_interface",
+        "vector_math"
       ]
     },
     {
@@ -361,6 +440,28 @@
       ]
     },
     {
+      "name": "plugin_platform_interface",
+      "version": "2.1.8",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "uuid",
+      "version": "4.6.0",
+      "dependencies": [
+        "crypto",
+        "fixnum"
+      ]
+    },
+    {
       "name": "path_provider_windows",
       "version": "2.3.0",
       "dependencies": [
@@ -388,20 +489,6 @@
       ]
     },
     {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
-      ]
-    },
-    {
-      "name": "plugin_platform_interface",
-      "version": "2.1.8",
-      "dependencies": [
-        "meta"
-      ]
-    },
-    {
       "name": "path_provider_linux",
       "version": "2.2.2",
       "dependencies": [
@@ -425,6 +512,18 @@
       "dependencies": []
     },
     {
+      "name": "fixnum",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "crypto",
+      "version": "3.0.7",
+      "dependencies": [
+        "typed_data"
+      ]
+    },
+    {
       "name": "ffi",
       "version": "2.2.0",
       "dependencies": []
@@ -440,6 +539,24 @@
       "dependencies": [
         "meta",
         "path"
+      ]
+    },
+    {
+      "name": "geocoding_darwin",
+      "version": "1.0.3",
+      "dependencies": [
+        "flutter",
+        "geocoding_platform_interface",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "geocoding_android",
+      "version": "5.1.0",
+      "dependencies": [
+        "flutter",
+        "geocoding_platform_interface",
+        "meta"
       ]
     }
   ],

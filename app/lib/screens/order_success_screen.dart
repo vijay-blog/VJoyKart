@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/order.dart';
-import 'order_detail_screen.dart';
+import 'home_screen.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
   final CustomerOrder order;
@@ -41,11 +41,14 @@ class OrderSuccessScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: OutlinedButton(
-                  onPressed: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => OrderDetailScreen(order: order)),
-                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const HomeScreen(initialIndex: 2),
+                      ),
+                      (route) => false,
+                    );
+                  },
                   child: const Text('VIEW ORDER'),
                 ),
               ),
@@ -54,8 +57,12 @@ class OrderSuccessScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: FilledButton(
-                  onPressed: () =>
-                      Navigator.popUntil(context, (r) => r.isFirst),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      (route) => false,
+                    );
+                  },
                   child: const Text('CONTINUE SHOPPING'),
                 ),
               ),
