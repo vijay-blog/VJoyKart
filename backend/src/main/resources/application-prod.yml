@@ -1,12 +1,56 @@
+server:
+  port: ${SERVER_PORT:8080}
+
 spring:
-  jpa:
-    show-sql: false
+  application:
+    name: nexamart-customer-backend
   datasource:
-    hikari:
-      maximum-pool-size: ${DB_POOL_SIZE:10}
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQL_DATABASE}?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${MYSQLUSER}
+    password: ${MYSQL_ROOT_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    ignore-migration-patterns:
+      - "*:missing"
+      - "*:future"
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:}
+  key-secret: ${RAZORPAY_KEY_SECRET:}
+
+security:
+  jwt:
+    secret: ${NEXAMART_JWT_SECRET:}
+    access-expiration-seconds: ${NEXAMART_ACCESS_EXPIRATION_SECONDS:3600}
+  bootstrap-admin:
+    email: ${NEXAMART_ADMIN_EMAIL:}
+    password: ${NEXAMART_ADMIN_PASSWORD:}
+    name: ${NEXAMART_ADMIN_NAME:VJoyKart Admin}
+
+
 nexamart:
-  jwt-secret: ${JWT_SECRET:${NEXAMART_JWT_SECRET:}}
-  otp-api-key: ${TWO_FACTOR_API_KEY:}
-  otp-template-name: ${TWO_FACTOR_TEMPLATE_NAME:}
-  otp-ttl-seconds: ${OTP_TTL_SECONDS:300}
-  otp-dev-mode: ${OTP_DEV_MODE:false}
+  jwt-secret: ${NEXAMART_JWT_SECRET:}
+  access-token-minutes: ${NEXAMART_ACCESS_TOKEN_MINUTES:60}
+  refresh-token-days: ${NEXAMART_REFRESH_TOKEN_DAYS:30}
+  admin-username: ${NEXAMART_ADMIN_USERNAME:admin}
+  admin-password: ${NEXAMART_ADMIN_PASSWORD:admin@223}
+  admin-email: ${NEXAMART_ADMIN_EMAIL:admin@nexamart.local}
+  admin-name: ${NEXAMART_ADMIN_NAME:VJoyKart Admin}
+  
+twofactor:
+  api-key: ${TWOFACTOR_API_KEY:}
+  base-url: ${TWOFACTOR_BASE_URL:https://2factor.in}
+  voice-base-url: ${TWOFACTOR_VOICE_BASE_URL:${TWOFACTOR_BASE_URL:https://2factor.in}}
+  timeout-seconds: ${TWOFACTOR_TIMEOUT_SECONDS:10}
+  sender-id: ${TWOFACTOR_SENDER_ID:}
+  # Retained for compatibility and startup diagnostics.
+  # For current OTP SMS endpoint, sender/template are account-side mapping.
+  otp-template: ${TWOFACTOR_OTP_TEMPLATE:}

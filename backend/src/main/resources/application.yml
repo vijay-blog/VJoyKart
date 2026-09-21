@@ -44,7 +44,13 @@ nexamart:
   admin-password: ${NEXAMART_ADMIN_PASSWORD:admin@223}
   admin-email: ${NEXAMART_ADMIN_EMAIL:admin@nexamart.local}
   admin-name: ${NEXAMART_ADMIN_NAME:VJoyKart Admin}
-  otp-api-key: ${TWO_FACTOR_API_KEY:}
-  otp-template-name: ${TWO_FACTOR_TEMPLATE_NAME:}
-  otp-ttl-seconds: ${OTP_TTL_SECONDS:300}
-  otp-dev-mode: ${OTP_DEV_MODE:false}
+  
+twofactor:
+  api-key: ${TWOFACTOR_API_KEY:}
+  base-url: ${TWOFACTOR_BASE_URL:https://2factor.in}
+  voice-base-url: ${TWOFACTOR_VOICE_BASE_URL:${TWOFACTOR_BASE_URL:https://2factor.in}}
+  timeout-seconds: ${TWOFACTOR_TIMEOUT_SECONDS:10}
+  sender-id: ${TWOFACTOR_SENDER_ID:}
+  # Retained for compatibility and startup diagnostics.
+  # For current OTP SMS endpoint, sender/template are account-side mapping.
+  otp-template: ${TWOFACTOR_OTP_TEMPLATE:}
