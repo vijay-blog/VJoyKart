@@ -32,7 +32,7 @@ razorpay:
 
 security:
   jwt:
-    secret: ${NEXAMART_JWT_SECRET:}
+    secret: ${NEXAMART_JWT_SECRET:${JWT_SECRET:}}
     access-expiration-seconds: ${NEXAMART_ACCESS_EXPIRATION_SECONDS:3600}
   bootstrap-admin:
     email: ${NEXAMART_ADMIN_EMAIL:}
@@ -41,7 +41,7 @@ security:
 
 
 nexamart:
-  jwt-secret: ${NEXAMART_JWT_SECRET:}
+  jwt-secret: ${NEXAMART_JWT_SECRET:${JWT_SECRET:}}
   access-token-minutes: ${NEXAMART_ACCESS_TOKEN_MINUTES:60}
   refresh-token-days: ${NEXAMART_REFRESH_TOKEN_DAYS:30}
   admin-username: ${NEXAMART_ADMIN_USERNAME:admin}

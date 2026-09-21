@@ -111,7 +111,7 @@ public class OtpService {
         // A person may use the same mobile number in the customer app even if
         // that number already exists on a partner/admin account. Find only a
         // CUSTOMER account here; otherwise create a separate customer account.
-        UserAccount user = users.findByPhoneAndRole(phone, Role.CUSTOMER)
+        UserAccount user = users.findTopByPhoneAndRoleOrderByIdAsc(phone, Role.CUSTOMER)
                 .orElseGet(() -> createCustomer(phone));
         if (user.getStatus() != AccountStatus.ACTIVE) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Customer account is not active.");
@@ -124,8 +124,12 @@ public class OtpService {
     private UserAccount createCustomer(String phone) {
         UserAccount user = new UserAccount();
         user.setName("VJoyKart Customer");
-        user.setUsername(phone);
-        user.setEmail("customer." + phone + "@vjoykart.app");
+        // Customer OTP accounts must not collide with partner/admin usernames or emails.
+        // Phone numbers are intentionally NOT used as the unique username because the
+        // same mobile number may exist on another account type in the shared database.
+        String suffix = UUID.randomUUID().toString().replace("-", "");
+        user.setUsername("customer_" + phone + "_" + suffix.substring(0, 8));
+        user.setEmail("customer." + phone + "." + suffix.substring(0, 8) + "@vjoykart.app");
         user.setPhone(phone);
         user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
         user.setRole(Role.CUSTOMER);
