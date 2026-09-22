@@ -5,7 +5,7 @@
   "packages": [
     {
       "name": "nexamart_customer",
-      "version": "2.1.1+4",
+      "version": "2.1.2+5",
       "dependencies": [
         "cupertino_icons",
         "flutter",
@@ -64,11 +64,11 @@
     },
     {
       "name": "geocoding",
-      "version": "4.0.0",
+      "version": "5.0.0",
       "dependencies": [
         "flutter",
         "geocoding_android",
-        "geocoding_ios",
+        "geocoding_darwin",
         "geocoding_platform_interface"
       ]
     },
@@ -304,19 +304,11 @@
     },
     {
       "name": "geocoding_platform_interface",
-      "version": "3.2.0",
+      "version": "5.0.0",
       "dependencies": [
         "flutter",
         "meta",
         "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "geocoding_ios",
-      "version": "3.1.0",
-      "dependencies": [
-        "flutter",
-        "geocoding_platform_interface"
       ]
     },
     {
@@ -628,11 +620,21 @@
       ]
     },
     {
-      "name": "geocoding_android",
-      "version": "4.0.1",
+      "name": "geocoding_darwin",
+      "version": "1.0.3",
       "dependencies": [
         "flutter",
-        "geocoding_platform_interface"
+        "geocoding_platform_interface",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "geocoding_android",
+      "version": "5.1.0",
+      "dependencies": [
+        "flutter",
+        "geocoding_platform_interface",
+        "meta"
       ]
     }
   ],

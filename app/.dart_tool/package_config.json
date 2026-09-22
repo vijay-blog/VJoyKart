@@ -99,27 +99,27 @@
     },
     {
       "name": "geocoding",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding-4.0.0",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding-5.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "geocoding_android",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_android-4.0.1",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_android-5.1.0",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.12"
     },
     {
-      "name": "geocoding_ios",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_ios-3.1.0",
+      "name": "geocoding_darwin",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_darwin-1.0.3",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.8"
     },
     {
       "name": "geocoding_platform_interface",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_platform_interface-3.2.0",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_platform_interface-5.0.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.8"
     },
     {
       "name": "geolocator",
