@@ -52,6 +52,18 @@ class Product {
     if (imgs.isEmpty && imageFromServer.isNotEmpty) {
       imgs.add(imageFromServer);
     }
+
+    // Product images are uploaded by the VJoyKart Partner/Admin backend.
+    // Older product records may have an empty imageUrl in the customer API,
+    // while the partner backend already has the uploaded BLOB. Use its public
+    // primary-image endpoint as a fallback so existing products do not need
+    // to be re-created or re-uploaded.
+    final productId = _integer(j['productId'] ?? j['id']);
+    if (imgs.isEmpty && productId > 0) {
+      imgs.add(
+        'https://nexamartpartner-production.up.railway.app/api/v1/catalog/products/$productId/image',
+      );
+    }
     final price = _number(j['price'] ?? j['mrp']);
     final discountedPrice = _number(
       j['discountedPrice'] ?? j['sellingPrice'] ?? price,
