@@ -16,6 +16,8 @@ public final class ApiModels{private ApiModels(){}
  public record OrderItemRequest(@NotNull Long productId,@Min(1) int quantity){}
  public record AddressRequest(@NotBlank String recipientName,String phone,@NotBlank String addressLine,String city,String state,String postalCode,Double latitude,Double longitude,boolean defaultAddress){}
  public record CreateOrderRequest(@NotEmpty List<OrderItemRequest> items,@NotNull AddressRequest address,PaymentMethod paymentMethod){}
+ public record PaymentCreateOrderResponse(Long paymentId,Long orderId,String keyId,String gateway,String gatewayOrderId,BigDecimal amount,String currency){}
+ public record PaymentVerifyRequest(@NotNull Long orderId,@NotBlank String gatewayOrderId,@NotBlank String gatewayPaymentId,@NotBlank String gatewaySignature){}
  public record ProfileUpdate(String name,String email,String vehicleType,String vehicleNumber,String licenseReference){}
  public record AvailabilityRequest(boolean available){}
  public record PageResponse<T>(List<T> content,int page,int pageSize,int totalPages,long totalElements,boolean hasNextPage,int number,int size,boolean last){public PageResponse(List<T> content,int page,int pageSize,int totalPages,long totalElements,boolean hasNextPage){this(content,page,pageSize,totalPages,totalElements,hasNextPage,page,pageSize,!hasNextPage);}}

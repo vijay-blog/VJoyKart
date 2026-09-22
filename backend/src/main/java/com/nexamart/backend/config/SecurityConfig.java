@@ -23,6 +23,8 @@ public class SecurityConfig {
         .requestMatchers("/api/v1/health","/api/v1/auth/login","/api/v1/auth/customer/register","/api/v1/auth/customer/send-otp","/api/v1/auth/customer/verify-otp","/api/v1/auth/refresh","/api/v1/catalog/categories/**","/api/v1/catalog/products/*/image","/api/v1/catalog/products/**").permitAll()
         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
         .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
+        .requestMatchers("/api/v1/payments/webhook").permitAll()
+        .requestMatchers("/api/v1/payments/**").hasRole("CUSTOMER")
         .anyRequest().authenticated())
       .addFilterBefore(jwt, UsernamePasswordAuthenticationFilter.class);
     return http.build();

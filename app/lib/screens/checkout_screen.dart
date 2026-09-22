@@ -23,6 +23,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool checkingSession = true;
   String paymentMethod = 'COD';
   int? _pendingOnlineOrderId;
+  String? _pendingGatewayOrderId;
   late final Razorpay _razorpay;
 
   @override
@@ -76,6 +77,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (paymentMethod == 'ONLINE') {
         final paymentOrder = await orders.createPaymentOrder(order);
         _pendingOnlineOrderId = paymentOrder.orderId;
+        _pendingGatewayOrderId = paymentOrder.gatewayOrderId;
         _razorpay.open({
           'key': paymentOrder.keyId,
           'amount': (paymentOrder.amount * 100).round(),
@@ -89,10 +91,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         cart.clear();
         if (!mounted) return;
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => OrderSuccessScreen(order: order)),
-            (r) => r.isFirst);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => OrderSuccessScreen(order: order)),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -107,18 +109,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     try {
+      final orderId = _pendingOnlineOrderId;
+      final gatewayOrderId = response.orderId ?? _pendingGatewayOrderId;
+      final paymentId = response.paymentId;
+      final signature = response.signature;
+      if (orderId == null || gatewayOrderId == null || paymentId == null || signature == null ||
+          gatewayOrderId.isEmpty || paymentId.isEmpty || signature.isEmpty) {
+        throw ApiException('Payment completed but the verification details were incomplete. Please contact support before placing another order.', 400);
+      }
       final order = await context.read<OrderProvider>().verifyPayment(
-            orderId: _pendingOnlineOrderId ?? 0,
-            gatewayOrderId: response.orderId ?? '',
-            gatewayPaymentId: response.paymentId ?? '',
-            gatewaySignature: response.signature ?? '',
+            orderId: orderId,
+            gatewayOrderId: gatewayOrderId,
+            gatewayPaymentId: paymentId,
+            gatewaySignature: signature,
           );
       if (!mounted) return;
+      _pendingOnlineOrderId = null;
+      _pendingGatewayOrderId = null;
       context.read<CartProvider>().clear();
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => OrderSuccessScreen(order: order)),
-          (r) => r.isFirst);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => OrderSuccessScreen(order: order)),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -129,6 +141,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
+    _pendingOnlineOrderId = null;
+    _pendingGatewayOrderId = null;
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text(response.message ?? 'Payment failed or cancelled')),
@@ -222,6 +237,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 icon: Icons.lock_outline,
                 title: 'Pay ₹${cart.total.round()} securely',
                 subtitle: 'Razorpay UPI, card, wallet or netbanking'),
+            if (paymentMethod == 'ONLINE')
+              Container(
+                margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xfff3f5ff),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.verified_user_outlined, size: 20, color: Color(0xff3454d1)),
+                    SizedBox(width: 9),
+                    Expanded(
+                      child: Text(
+                        'Secure checkout through Razorpay. Your card/UPI details are handled by the payment gateway.',
+                        style: TextStyle(fontSize: 12.5, height: 1.35),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ])),
           const SizedBox(height: 12),
           Card(
