@@ -12,8 +12,7 @@ public class FlywayRecoveryConfig {
     return flyway -> {
       boolean hasFailedMigration = Arrays.stream(flyway.info().all())
           .anyMatch(info -> info.getState().isFailed());
-      boolean hasValidationMismatch = !flyway.validateWithResult().validationSuccessful;
-      if (hasFailedMigration || hasValidationMismatch) {
+      if (hasFailedMigration) {
         flyway.repair();
       }
       flyway.migrate();
