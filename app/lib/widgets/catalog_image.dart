@@ -41,7 +41,10 @@ class CatalogImage extends StatelessWidget {
     // Admin catalog images may be stored as a relative backend path such as
     // /uploads/products/abc.jpg. Resolve those against the configured API host.
     if (raw.startsWith('/')) {
-      final base = AppConfig.apiBaseUrl.replaceFirst(RegExp(r'/api/v1$'), '');
+      final isProductImage = raw.startsWith('/api/v1/catalog/products/');
+      final base = isProductImage
+          ? AppConfig.catalogImageBaseUrl
+          : AppConfig.apiBaseUrl.replaceFirst(RegExp(r'/api/v1$'), '');
       final url = '$base$raw';
       return Image.network(
         url,

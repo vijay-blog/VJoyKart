@@ -10,6 +10,12 @@ class AppConfig {
     ),
   );
 
+  // Product image binaries are served by the catalog/image backend. Keep this
+  // separate from the customer API so catalog images can continue to render
+  // when the customer API and Partner catalog are deployed independently.
+  static const String catalogImageBaseUrl =
+      'https://nexamartpartner-production.up.railway.app';
+
   static String? get runtimeConfigurationIssue {
     final value = apiBaseUrl.toLowerCase();
     if (!_isReleaseBuild) return null;

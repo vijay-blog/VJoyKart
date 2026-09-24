@@ -29,6 +29,27 @@ void main() {
     expect(product.available, isTrue);
   });
 
+  test('Product parses multiple image objects in sort order', () {
+    final product = Product.fromJson({
+      'productId': '44',
+      'name': 'Salt',
+      'price': '30',
+      'stock': 20,
+      'images': [
+        {'imageId': 2, 'url': '/api/v1/catalog/products/44/images/2', 'sortOrder': 1},
+        {'imageId': 1, 'url': '/api/v1/catalog/products/44/images/1', 'sortOrder': 0},
+        {'imageId': 3, 'url': '/api/v1/catalog/products/44/images/3', 'sortOrder': 2},
+      ],
+    });
+
+    expect(product.images, [
+      '/api/v1/catalog/products/44/images/1',
+      '/api/v1/catalog/products/44/images/2',
+      '/api/v1/catalog/products/44/images/3',
+    ]);
+    expect(product.imageAsset, '/api/v1/catalog/products/44/images/1');
+  });
+
   test('Product with zero backend stock is unavailable', () {
     final product = Product.fromJson({
       'productId': '43',

@@ -15,7 +15,6 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
-    out-of-order: true
     ignore-migration-patterns:
       - "*:missing"
       - "*:future"

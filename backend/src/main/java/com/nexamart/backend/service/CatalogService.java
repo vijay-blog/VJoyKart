@@ -6,7 +6,6 @@ import com.nexamart.backend.api.ApiModels.PageResponse;
 import com.nexamart.backend.api.ApiModels.ProductResponse;
 import com.nexamart.backend.domain.Category;
 import com.nexamart.backend.domain.Product;
-import com.nexamart.backend.domain.ProductImage;
 import com.nexamart.backend.exception.ApiException;
 import com.nexamart.backend.repository.CategoryRepository;
 import com.nexamart.backend.repository.ProductRepository;

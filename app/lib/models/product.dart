@@ -39,6 +39,26 @@ class Product {
 
   String get category => categoryName;
   String get imageAsset => images.isEmpty ? '' : images.first;
+
+  Product copyWith({List<String>? images}) => Product(
+        id: id,
+        name: name,
+        description: description,
+        brand: brand,
+        categoryId: categoryId,
+        categoryName: categoryName,
+        images: images ?? this.images,
+        mrp: mrp,
+        sellingPrice: sellingPrice,
+        discountPercentage: discountPercentage,
+        unit: unit,
+        weight: weight,
+        size: size,
+        attributes: attributes,
+        available: available,
+        stockQuantity: stockQuantity,
+        deliveryType: deliveryType,
+      );
   int get stock => stockQuantity;
   double get discount => discountPercentage > 0
       ? discountPercentage
@@ -46,9 +66,44 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> j) {
     final imageFromServer = (j['imageAsset'] ?? j['imageUrl'] ?? '').toString();
-    final imgs = (j['images'] is List)
-        ? (j['images'] as List).map((e) => e.toString()).toList()
-        : <String>[];
+    final imageEntries = <Map<String, dynamic>>[];
+    final rawImages = j['images'];
+    if (rawImages is List) {
+      for (var index = 0; index < rawImages.length; index++) {
+        final entry = rawImages[index];
+        if (entry is Map) {
+          final candidate = entry['url'] ?? entry['imageUrl'] ?? entry['path'] ?? entry['src'];
+          if (candidate != null && candidate.toString().trim().isNotEmpty) {
+            final sortOrder = entry['sortOrder'] is num
+                ? (entry['sortOrder'] as num).toInt()
+                : int.tryParse('${entry['sortOrder'] ?? index}') ?? index;
+            imageEntries.add({
+              'sortOrder': sortOrder,
+              'index': index,
+              'url': candidate.toString().trim(),
+            });
+          }
+        } else if (entry != null && entry.toString().trim().isNotEmpty) {
+          imageEntries.add({
+            'sortOrder': index,
+            'index': index,
+            'url': entry.toString().trim(),
+          });
+        }
+      }
+    }
+    imageEntries.sort((a, b) {
+      final byOrder = (a['sortOrder'] as int).compareTo(b['sortOrder'] as int);
+      return byOrder != 0
+          ? byOrder
+          : (a['index'] as int).compareTo(b['index'] as int);
+    });
+    final imgs = <String>[];
+    for (final entry in imageEntries) {
+      final url = entry['url'] as String;
+      if (!imgs.contains(url)) imgs.add(url);
+    }
+
     if (imgs.isEmpty && imageFromServer.isNotEmpty) {
       imgs.add(imageFromServer);
     }
