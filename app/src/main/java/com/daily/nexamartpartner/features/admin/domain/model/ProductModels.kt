@@ -114,7 +114,8 @@ data class ProductDetails(
     val createdAt: String?,
     val updatedAt: String?,
     /** Only actions the backend currently allows for this product; never inferred locally. */
-    val allowedActions: List<ProductAdminAction>
+    val allowedActions: List<ProductAdminAction>,
+    val discountAmount: BigDecimal? = null
 )
 
 /**
@@ -130,5 +131,12 @@ data class ProductDraft(
     val discountPercent: String? = null,
     val stock: String? = null,
     val sku: String? = null,
-    val unit: String? = null
+    val unit: String? = null,
+    val imageUrl: String? = null
+)
+
+data class ProductImageUpload(
+    val bytes: ByteArray,
+    val fileName: String,
+    val contentType: String
 )

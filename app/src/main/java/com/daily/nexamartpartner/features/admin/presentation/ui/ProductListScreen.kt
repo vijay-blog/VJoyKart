@@ -78,6 +78,11 @@ class ProductListScreen : Fragment(R.layout.fragment_admin_products) {
         collectEvents()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refresh()
+    }
+
     private fun setupRecyclerView() {
         val manager = LinearLayoutManager(requireContext())
         binding.productsRecyclerView.layoutManager = manager

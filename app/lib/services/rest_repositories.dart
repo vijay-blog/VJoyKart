@@ -13,13 +13,14 @@ class RestProductRepository implements ProductRepository {
 
   @override
   Future<List<CategoryItem>> getCategories() async {
-    final data = await apiClient.request(HttpMethod.get, '/categories');
-    if (data is List) {
-      return data
+    final data = await apiClient.request(HttpMethod.get, '/catalog/categories');
+    final content = data is Map ? data['content'] : data;
+    if (content is List) {
+      return content
           .map((e) => CategoryItem(
-                name: (e as Map<String, dynamic>)['name']?.toString() ?? '',
-                icon: (e)['imageUrl']?.toString() ??
-                    'assets/images/products/oil.png',
+                id: (e as Map<String, dynamic>)['categoryId']?.toString() ?? '',
+                name: e['name']?.toString() ?? '',
+                imageUrl: e['imageUrl']?.toString() ?? '',
               ))
           .toList();
     }
@@ -44,7 +45,7 @@ class RestProductRepository implements ProductRepository {
 
     final data = await apiClient.request(
       HttpMethod.get,
-      '/products',
+      '/catalog/products',
       queryParameters: params,
     );
 
@@ -63,7 +64,7 @@ class RestProductRepository implements ProductRepository {
   @override
   Future<Product?> getProductById(String id) async {
     final data =
-        await apiClient.request(HttpMethod.get, '/products/$id');
+        await apiClient.request(HttpMethod.get, '/catalog/products/$id');
     if (data is Map<String, dynamic>) {
       return Product.fromJson(data);
     }
@@ -79,7 +80,7 @@ class RestProductRepository implements ProductRepository {
   Future<List<Product>> searchProducts(String query) async {
     final data = await apiClient.request(
       HttpMethod.get,
-      '/products/search',
+      '/catalog/products',
       queryParameters: {'query': query},
     );
     if (data is List) {
@@ -93,7 +94,10 @@ class RestProductRepository implements ProductRepository {
 
 class RestOrderRepository implements OrderRepository {
   final ApiClient apiClient;
-  Future<int> _customerId() async { final prefs=await SharedPreferences.getInstance(); return prefs.getInt('nm.customerId') ?? 0; }
+  Future<int> _customerId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('nm.customerId') ?? 0;
+  }
 
   RestOrderRepository({required this.apiClient});
 
@@ -107,7 +111,8 @@ class RestOrderRepository implements OrderRepository {
     required double total,
   }) async {
     final body = {
-      if (address.id != null && int.tryParse(address.id!) != null) 'addressId': int.parse(address.id!),
+      if (address.id != null && int.tryParse(address.id!) != null)
+        'addressId': int.parse(address.id!),
       'address': address.toJson(),
       'paymentMethod': 'COD',
       'items': items
@@ -130,7 +135,8 @@ class RestOrderRepository implements OrderRepository {
   @override
   Future<List<CustomerOrder>> getOrders() async {
     final customerId = await _customerId();
-    final data = await apiClient.request(HttpMethod.get, '/orders', queryParameters: {'customerId': customerId});
+    final data = await apiClient.request(HttpMethod.get, '/orders',
+        queryParameters: {'customerId': customerId});
     if (data is List) {
       return data
           .map((e) => _parseOrder(e as Map<String, dynamic>, const [], ''))
@@ -141,8 +147,7 @@ class RestOrderRepository implements OrderRepository {
 
   @override
   Future<CustomerOrder?> getOrderById(String orderId) async {
-    final data =
-        await apiClient.request(HttpMethod.get, '/orders/$orderId');
+    final data = await apiClient.request(HttpMethod.get, '/orders/$orderId');
     if (data is Map<String, dynamic>) {
       return _parseOrder(data, const [], '');
     }
@@ -173,8 +178,10 @@ class RestAddressRepository implements AddressRepository {
 
   @override
   Future<List<Address>> getAddresses() async {
-    final prefs=await SharedPreferences.getInstance(); final customerId=prefs.getInt('nm.customerId') ?? 0;
-    final data = await apiClient.request(HttpMethod.get, '/customers/$customerId/addresses');
+    final prefs = await SharedPreferences.getInstance();
+    final customerId = prefs.getInt('nm.customerId') ?? 0;
+    final data = await apiClient.request(
+        HttpMethod.get, '/customers/$customerId/addresses');
     if (data is List) {
       return data
           .map((e) => Address.fromJson(e as Map<String, dynamic>))
@@ -189,7 +196,8 @@ class RestAddressRepository implements AddressRepository {
     if (address.id == null ||
         address.id!.isEmpty ||
         address.id!.startsWith('addr_new')) {
-      final prefs=await SharedPreferences.getInstance(); final customerId=prefs.getInt('nm.customerId') ?? 0;
+      final prefs = await SharedPreferences.getInstance();
+      final customerId = prefs.getInt('nm.customerId') ?? 0;
       data = await apiClient.request(
         HttpMethod.post,
         '/customers/$customerId/addresses',

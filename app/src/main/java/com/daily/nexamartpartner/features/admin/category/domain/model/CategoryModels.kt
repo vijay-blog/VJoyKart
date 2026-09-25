@@ -15,6 +15,11 @@ data class Category(
 
 enum class CategoryAdminAction(val backendValue: String) { ACTIVATE("ACTIVATE"), DEACTIVATE("DEACTIVATE"), DELETE("DELETE"), EDIT("EDIT") }
 
-data class CategoryDraft(val name: String, val description: String?, val sortOrder: String?)
+data class CategoryDraft(
+    val name: String,
+    val description: String?,
+    val imageUrl: String?,
+    val sortOrder: String?
+)
 data class CategoryQuery(val page: Int, val pageSize: Int, val search: String?, val active: Boolean?)
 data class PagedCategories(val categories: List<Category>, val page: Int, val pageSize: Int, val totalPages: Int, val totalElements: Long, val hasNextPage: Boolean)

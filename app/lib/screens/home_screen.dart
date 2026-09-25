@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/app_theme.dart';
-import '../data/mock_data.dart';
 import '../providers/catalog_provider.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/home_category_slider.dart';
 import '../widgets/product_card.dart';
+import '../widgets/catalog_image.dart';
 import 'all_categories_screen.dart';
 import 'category_screen.dart';
 import 'search_screen.dart';
@@ -14,13 +14,22 @@ import 'orders_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int initialIndex;
+
+  const HomeScreen({super.key, this.initialIndex = 0});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int index = 0;
+  late int index;
+
+  @override
+  void initState() {
+    super.initState();
+    index = widget.initialIndex.clamp(0, 4).toInt();
+  }
   @override
   Widget build(BuildContext c) {
     final cart = c.watch<CartProvider>();
@@ -66,218 +75,386 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _HomeTab extends StatelessWidget {
   const _HomeTab();
+
   @override
-  Widget build(BuildContext c) {
-    final cat = c.watch<CatalogProvider>();
-    final cart = c.watch<CartProvider>();
-    final sections = <Map<String, String>>[
-      {'title': 'Fresh Groceries', 'category': 'Grocery'},
-      {'title': 'Fruits & Vegetables', 'category': 'Fruits'},
-      {'title': 'Meat & Non-Veg', 'category': 'Meat'},
-      {'title': 'Baby Care', 'category': 'Baby Products'},
-      {'title': 'Fashion', 'category': 'Men'},
-      {'title': 'Electronics', 'category': 'Electronics'},
-      {'title': 'Home & Furniture', 'category': 'Furniture'},
-      {'title': 'Best Sellers', 'category': ''},
-      {'title': 'Deals & Offers', 'category': ''},
-      {'title': 'New Arrivals', 'category': ''},
-      {'title': 'Recommended', 'category': ''},
-    ];
+  Widget build(BuildContext context) {
+    final catalog = context.watch<CatalogProvider>();
+    final cart = context.watch<CartProvider>();
+    final sections = catalog.categories
+        .map((category) => (
+              category: category,
+              products:
+                  catalog.search('', categoryId: category.id).take(10).toList(),
+            ))
+        .where((section) => section.products.isNotEmpty)
+        .toList();
+
     return SafeArea(
-        child: CustomScrollView(slivers: [
-      if (cat.error != null && cat.products.isEmpty)
-        SliverPadding(padding: const EdgeInsets.fromLTRB(18, 10, 18, 0), sliver: SliverToBoxAdapter(child: Card(child: ListTile(leading: const Icon(Icons.cloud_off), title: const Text('Unable to load NexaMart catalogue'), subtitle: const Text('Check your internet connection and try again.'), trailing: IconButton(onPressed: cat.load, icon: const Icon(Icons.refresh))))))),
-      SliverPadding(
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
-          sliver: SliverToBoxAdapter(
-              child: Row(children: [
-            Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                    color: const Color(0xffe9edff),
-                    borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.shopping_bag_rounded,
-                    color: AppTheme.green)),
-            const SizedBox(width: 10),
-            const Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Text('NexaMart',
-                      style: TextStyle(
-                          color: AppTheme.green,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16)),
-                  SizedBox(height: 2),
-                  Text('Deliver to',
-                      style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  SizedBox(height: 2),
-                  Row(children: [
-                    Icon(Icons.location_on, color: AppTheme.green, size: 18),
-                    SizedBox(width: 4),
-                    Text('Hyderabad',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 18))
-                  ])
-                ])),
-            Badge(
-                isLabelVisible: cart.count > 0,
-                label: Text('${cart.count}'),
-                child: IconButton(
-                    onPressed: () => Navigator.push(c,
-                        MaterialPageRoute(builder: (_) => const CartScreen())),
-                    icon: const Icon(Icons.shopping_bag_outlined, size: 27)))
-          ]))),
-      SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-          sliver: SliverToBoxAdapter(
-              child: InkWell(
-                  onTap: () => Navigator.push(c,
-                      MaterialPageRoute(builder: (_) => const SearchScreen())),
+      child: RefreshIndicator(
+        onRefresh: catalog.load,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            if (catalog.error != null && catalog.products.isEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.cloud_off),
+                      title: const Text('Unable to load products'),
+                      subtitle: const Text('Please try again.'),
+                      trailing: IconButton(
+                        onPressed: catalog.load,
+                        icon: const Icon(Icons.refresh),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xffe9edff),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.shopping_bag_rounded,
+                        color: AppTheme.green,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'VJoyKart',
+                            style: TextStyle(
+                              color: AppTheme.green,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Deliver to',
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                          SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: AppTheme.green,
+                                size: 18,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Hyderabad',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Badge(
+                      isLabelVisible: cart.count > 0,
+                      label: Text('${cart.count}'),
+                      child: IconButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const CartScreen(),
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.shopping_bag_outlined,
+                          size: 27,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              sliver: SliverToBoxAdapter(
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SearchScreen()),
+                  ),
                   borderRadius: BorderRadius.circular(15),
                   child: Container(
-                      height: 52,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15)),
-                      child: const Row(children: [
+                    height: 52,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: const Row(
+                      children: [
                         Icon(Icons.search, color: Colors.grey),
                         SizedBox(width: 10),
-                        Text('Search groceries, clothes, electronics...',
-                            style: TextStyle(color: Colors.grey))
-                      ]))))),
-      SliverPadding(
-          padding: const EdgeInsets.fromLTRB(18, 2, 18, 0),
-          sliver: SliverToBoxAdapter(
-              child: HomeCategorySlider(
-                  categories: cat.categories.take(24).map((x) => {'name': x.name, 'image': x.icon}).toList(),
-                  onTapCategory: (category) => Navigator.push(
-                      c,
-                      MaterialPageRoute(
-                         builder: (_) =>
-                             CategoryScreen(category: category)))))),
-      SliverPadding(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
-          sliver: SliverToBoxAdapter(
-              child: Container(
+                        Text(
+                          'Search products...',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (catalog.categories.isNotEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(18, 2, 18, 0),
+                sliver: SliverToBoxAdapter(
+                  child: HomeCategorySlider(
+                    categories: catalog.categories
+                        .take(24)
+                        .map((item) => {
+                              'name': item.name,
+                              'image': item.imageUrl,
+                            })
+                        .toList(),
+                    onTapCategory: (name) {
+                      final category =
+                          catalog.categories.firstWhere((x) => x.name == name);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CategoryScreen(
+                            categoryId: category.id,
+                            categoryName: category.name,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
+              sliver: SliverToBoxAdapter(
+                child: Container(
                   height: 154,
                   padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
-                      color: const Color(0xffe7ebff),
-                      borderRadius: BorderRadius.circular(24)),
-                  child: Row(children: [
-                    const Expanded(
+                    color: const Color(0xffe7ebff),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Row(
+                    children: [
+                      const Expanded(
                         child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                          Text('Everything You Need, Near You.',
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Everything You Need, Near You.',
                               style: TextStyle(
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppTheme.green)),
-                          SizedBox(height: 8),
-                          Text('Groceries • Fashion • Electronics',
-                              style: TextStyle(color: Colors.black54)),
-                        ])),
-                    Container(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w900,
+                                color: AppTheme.green,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Products selected by your local store',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
                         width: 104,
                         height: 104,
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(22)),
-                        child: const Icon(Icons.local_mall_rounded,
-                            size: 58, color: AppTheme.green))
-                  ])))),
-      SliverPadding(
-          padding: const EdgeInsets.fromLTRB(18, 24, 18, 10),
-          sliver: SliverToBoxAdapter(
-              child: Row(children: [
-            const Text('Shop by Category',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-            const Spacer(),
-            TextButton(
-                onPressed: () => Navigator.push(
-                    c,
-                    MaterialPageRoute(
-                        builder: (_) => const AllCategoriesScreen())),
-                child: const Text('View all'))
-          ]))),
-      SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        sliver: SliverToBoxAdapter(
-            child: SizedBox(
-                height: 112,
-                child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.take(8).length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 10),
-                    itemBuilder: (_, i) {
-                      final x = categories[i];
-                      return InkWell(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(22),
+                        ),
+                        child: const Icon(
+                          Icons.local_mall_rounded,
+                          size: 58,
+                          color: AppTheme.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (catalog.categories.isNotEmpty) ...[
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(18, 24, 18, 10),
+                sliver: SliverToBoxAdapter(
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Shop by Category',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AllCategoriesScreen(),
+                          ),
+                        ),
+                        child: const Text('View all'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                sliver: SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 112,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: catalog.categories.take(8).length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 10),
+                      itemBuilder: (_, index) {
+                        final category = catalog.categories[index];
+                        return InkWell(
                           onTap: () => Navigator.push(
-                              c,
-                              MaterialPageRoute(
-                                  builder: (_) =>
-                                      CategoryScreen(category: x['name']!))),
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CategoryScreen(
+                                categoryId: category.id,
+                                categoryName: category.name,
+                              ),
+                            ),
+                          ),
                           child: Container(
-                              width: 82,
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16)),
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                        child: Image.asset(x['image']!,
-                                            fit: BoxFit.contain)),
-                                    const SizedBox(height: 5),
-                                    Text(x['name']!,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700))
-                                  ])));
-                    }))),
-      ),
-      if (cat.loading)
-        const SliverToBoxAdapter(
-            child: Padding(
-                padding: EdgeInsets.all(30),
-                child: Center(child: CircularProgressIndicator())))
-      else
-        ...sections.map((s) {
-          final list = s['category']!.isEmpty
-              ? cat.products
-              : cat.search('', category: s['category']!);
-          final products = list.take(10).toList();
-          return SliverPadding(
-              padding: const EdgeInsets.fromLTRB(18, 22, 18, 0),
-              sliver: SliverToBoxAdapter(
+                            width: 82,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: CatalogImage(
+                                    source: category.imageUrl,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  category.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            if (catalog.loading)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(30),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              )
+            else if (catalog.products.isEmpty && catalog.error == null)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 42),
                   child: Column(
+                    children: [
+                      Icon(
+                        Icons.inventory_2_outlined,
+                        size: 58,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'No products available',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Products added by the administrator will appear here.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ...sections.map(
+                (section) => SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(18, 22, 18, 0),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    Text(s['title']!,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                        height: 286,
-                        child: ListView.separated(
+                        Text(
+                          section.category.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 286,
+                          child: ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            itemBuilder: (_, i) => SizedBox(
-                                width: 176,
-                                child: ProductCard(product: products[i])),
+                            itemCount: section.products.length,
+                            itemBuilder: (_, index) => SizedBox(
+                              width: 176,
+                              child: ProductCard(
+                                product: section.products[index],
+                              ),
+                            ),
                             separatorBuilder: (_, __) =>
                                 const SizedBox(width: 12),
-                            itemCount: products.length))
-                  ])));
-        }),
-      const SliverToBoxAdapter(child: SizedBox(height: 30))
-    ]));
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            const SliverToBoxAdapter(child: SizedBox(height: 30)),
+          ],
+        ),
+      ),
+    );
   }
 }

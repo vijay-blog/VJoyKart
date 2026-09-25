@@ -1,16 +1,16 @@
 <resources>
-    <string name="app_name">NexaMart Admin &amp; Delivery</string>
-    <string name="brand_title">NexaMart Admin &amp; Delivery</string>
-    <string name="login_subtitle">Sign in to manage NexaMart operations</string>
+    <string name="app_name">VjoyKart</string>
+    <string name="brand_title">VjoyKart</string>
+    <string name="login_subtitle">Sign in to manage VjoyKart operations</string>
     <string name="splash_title">Preparing secure session…</string>
     <string name="identifier_label">Email address</string>
     <string name="password_label">Password</string>
     <string name="login_button">Sign in</string>
     <string name="create_account">Create account</string>
     <string name="logout_button">Logout</string>
-    <string name="admin_dashboard_title">NexaMart Admin</string>
+    <string name="admin_dashboard_title">VjoyKart Admin</string>
     <string name="admin_dashboard_subtitle">Manage your marketplace operations</string>
-    <string name="admin_dashboard_branding_title">NexaMart Admin</string>
+    <string name="admin_dashboard_branding_title">VjoyKart Admin</string>
     <string name="admin_dashboard_admin_fallback">Admin</string>
     <string name="admin_dashboard_greeting_subtitle">Here\'s what\'s happening with your store today.</string>
     <string name="admin_dashboard_greeting_with_name">%1$s, %2$s</string>
@@ -33,9 +33,9 @@
     <string name="cd_dashboard_profile_button">Open admin profile</string>
     <string name="cd_dashboard_notifications_placeholder">Notifications will be available in a future phase</string>
     <string name="cd_dashboard_kpi_icon">Dashboard metric icon</string>
-    <string name="delivery_dashboard_title">NexaMart Delivery</string>
+    <string name="delivery_dashboard_title">VjoyKart Delivery</string>
     <string name="delivery_dashboard_subtitle">Manage your deliveries</string>
-    <string name="unsupported_role_message">This account does not have permission to use the NexaMart Admin &amp; Delivery application.</string>
+    <string name="unsupported_role_message">This account does not have permission to use the VjoyKart application.</string>
     <string name="access_restricted_title">Access Restricted</string>
     <string name="back_to_login">Back to Login</string>
     <string name="back_button">Back</string>
@@ -143,6 +143,12 @@
     <string name="admin_product_form_stock_hint">Stock (optional)</string>
     <string name="admin_product_form_sku_hint">SKU (optional)</string>
     <string name="admin_product_form_unit_hint">Unit (optional)</string>
+    <string name="admin_product_form_image_url_hint">Product image URL (optional)</string>
+    <string name="admin_product_form_photo_title">Product photo</string>
+    <string name="admin_product_form_photo_content_description">Product photo preview</string>
+    <string name="admin_product_form_select_photo">Choose photo</string>
+    <string name="admin_product_form_remove_photo">Remove</string>
+    <string name="admin_product_form_no_photo">No new photo selected</string>
     <string name="admin_product_form_save">Save Product</string>
     <string name="admin_product_form_categories_unavailable">Category options are unavailable until the backend category lookup contract is confirmed.</string>
     <string name="admin_product_form_unsaved_title">Discard changes?</string>

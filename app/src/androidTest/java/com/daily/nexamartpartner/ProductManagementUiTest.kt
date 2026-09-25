@@ -141,6 +141,11 @@ class ProductManagementUiTest {
         override suspend fun updateProduct(productId: String, draft: ProductDraft): AppResult<ProductDetails> =
             getProductDetails(productId)
 
+        override suspend fun uploadProductImage(
+            productId: String,
+            image: com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
+        ): AppResult<ProductDetails> = getProductDetails(productId)
+
         override suspend fun performProductAction(productId: String, action: ProductAdminAction): AppResult<Unit> =
             AppResult.Success(Unit)
 

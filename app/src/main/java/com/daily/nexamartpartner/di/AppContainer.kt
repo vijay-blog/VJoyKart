@@ -12,10 +12,10 @@ import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendAdmi
 import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendAdminOrdersContract
 import com.daily.nexamartpartner.features.admin.data.contract.DeliveryPartnerContract
 import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendDeliveryPartnerContract
-import com.daily.nexamartpartner.features.admin.data.contract.PendingBackendProductManagementContract
+import com.daily.nexamartpartner.features.admin.data.contract.BackendProductManagementContract
 import com.daily.nexamartpartner.features.admin.data.contract.ProductManagementContract
 import com.daily.nexamartpartner.features.admin.category.data.contract.CategoryManagementContract
-import com.daily.nexamartpartner.features.admin.category.data.contract.PendingBackendCategoryManagementContract
+import com.daily.nexamartpartner.features.admin.category.data.contract.BackendCategoryManagementContract
 import com.daily.nexamartpartner.features.admin.category.data.repository.CategoryManagementRepositoryImpl
 import com.daily.nexamartpartner.features.admin.category.data.source.CategoryManagementApi
 import com.daily.nexamartpartner.features.admin.category.data.source.CategoryManagementRemoteDataSource
@@ -121,6 +121,7 @@ import com.daily.nexamartpartner.features.admin.domain.usecase.GetProductsUseCas
 import com.daily.nexamartpartner.features.admin.domain.usecase.PerformProductAdminActionUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.UpdateDeliveryPartnerUseCase
 import com.daily.nexamartpartner.features.admin.domain.usecase.UpdateProductUseCase
+import com.daily.nexamartpartner.features.admin.domain.usecase.UploadProductImageUseCase
 import com.daily.nexamartpartner.features.auth.data.contract.AuthRequestContract
 import com.daily.nexamartpartner.features.auth.data.contract.ConfigurableAuthRequestContract
 import com.daily.nexamartpartner.features.auth.data.repository.AuthRepositoryImpl
@@ -167,8 +168,8 @@ class AppContainer(context: Context) {
     private val adminDashboardContract: AdminDashboardContract = PendingBackendAdminDashboardContract()
     private val adminOrdersContract: AdminOrdersContract = PendingBackendAdminOrdersContract()
     private val deliveryPartnerContract: DeliveryPartnerContract = PendingBackendDeliveryPartnerContract()
-    private val productManagementContract: ProductManagementContract = PendingBackendProductManagementContract()
-    private val categoryManagementContract: CategoryManagementContract = PendingBackendCategoryManagementContract()
+    private val productManagementContract: ProductManagementContract = BackendProductManagementContract()
+    private val categoryManagementContract: CategoryManagementContract = BackendCategoryManagementContract()
     private val customerManagementContract: CustomerManagementContract = PendingBackendCustomerManagementContract()
     private val deliveryDashboardContract: DeliveryDashboardContract = PendingBackendDeliveryDashboardContract()
     private val deliveryOrderWorkflowContract: DeliveryOrderWorkflowContract = PendingBackendDeliveryOrderWorkflowContract()
@@ -325,6 +326,10 @@ class AppContainer(context: Context) {
 
     fun provideUpdateProductUseCase(): UpdateProductUseCase =
         UpdateProductUseCase(productManagementRepositoryOverride ?: productManagementRepository)
+
+
+    fun provideUploadProductImageUseCase(): UploadProductImageUseCase =
+        UploadProductImageUseCase(productManagementRepositoryOverride ?: productManagementRepository)
 
     fun providePerformProductAdminActionUseCase(): PerformProductAdminActionUseCase =
         PerformProductAdminActionUseCase(productManagementRepositoryOverride ?: productManagementRepository)

@@ -64,6 +64,9 @@ class Address {
         'line2': street,
         'area': area,
         'landmark': area,
+        'addressLine': [house, street, area]
+            .where((part) => part.trim().isNotEmpty)
+            .join(', '),
         'city': city,
         'state': state,
         'pincode': pincode,

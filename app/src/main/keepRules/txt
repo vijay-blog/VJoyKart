@@ -1,0 +1,2 @@
+cd C:\app\application\VJoyKart\app
+C:\src\flutter\bin\flutter.bat build apk --release

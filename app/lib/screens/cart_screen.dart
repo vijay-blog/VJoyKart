@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/cart_provider.dart';
 import 'checkout_screen.dart';
+import '../widgets/catalog_image.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -82,8 +83,8 @@ class CartScreen extends StatelessWidget {
                             color: const Color(0xfff3f5ff),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Image.asset(
-                            item.product.imageAsset,
+                          child: CatalogImage(
+                            source: item.product.imageAsset,
                             fit: BoxFit.contain,
                           ),
                         ),

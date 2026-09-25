@@ -44,7 +44,8 @@ data class ProductDetailsDto(
     @field:Json(name = "imageUrl") val imageUrl: String?,
     @field:Json(name = "createdAt") val createdAt: String?,
     @field:Json(name = "updatedAt") val updatedAt: String?,
-    @field:Json(name = "allowedActions") val allowedActions: List<String>?
+    @field:Json(name = "allowedActions") val allowedActions: List<String>?,
+    @field:Json(name = "discountAmount") val discountAmount: String? = null
 )
 
 data class CategoryOptionDto(

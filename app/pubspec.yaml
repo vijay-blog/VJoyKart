@@ -1,8 +1,8 @@
 name: nexamart_customer
 
-description: NexaMart customer marketplace app.
+description: VJoyKart customer marketplace app.
 publish_to: "none"
-version: 2.0.0+2
+version: 2.1.2+5
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -16,6 +16,9 @@ dependencies:
   shared_preferences: ^2.3.2
   intl: ^0.19.0
   razorpay_flutter: ^1.4.5
+  geolocator: ^13.0.2
+  geocoding: ^5.0.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -27,3 +30,4 @@ flutter:
   assets:
     - assets/images/categories/
     - assets/images/products/
+    - assets/images/vjoykart_icon.png

@@ -1,11 +1,13 @@
 package com.daily.nexamartpartner.features.admin.presentation.ui
 
 import android.os.Bundle
+import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -17,6 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.daily.nexamartpartner.R
 import com.daily.nexamartpartner.core.widgets.UiFeedback
+import com.daily.nexamartpartner.core.config.AppConfig
 import com.daily.nexamartpartner.databinding.FragmentAdminProductFormBinding
 import com.daily.nexamartpartner.di.appContainer
 import com.daily.nexamartpartner.features.admin.presentation.state.ProductFormUiState
@@ -26,6 +29,8 @@ import com.daily.nexamartpartner.features.admin.presentation.viewmodel.ProductFo
 import com.daily.nexamartpartner.features.auth.presentation.viewmodel.AuthCoordinatorViewModel
 import com.daily.nexamartpartner.features.auth.presentation.viewmodel.AuthCoordinatorViewModelFactory
 import kotlinx.coroutines.launch
+import com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
+import coil.load
 
 class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
     private var _binding: FragmentAdminProductFormBinding? = null
@@ -61,7 +66,8 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
             },
             getCategoryOptions = container.provideGetProductCategoryOptionsUseCase(),
             createProduct = container.provideCreateProductUseCase(),
-            updateProduct = container.provideUpdateProductUseCase()
+            updateProduct = container.provideUpdateProductUseCase(),
+            uploadProductImage = container.provideUploadProductImageUseCase()
         )
     }
 
@@ -71,6 +77,13 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
 
     /** Prevents programmatic `setText` calls during state rendering from being treated as user edits. */
     private var suppressFieldWatchers = false
+    private var selectedImageUpload: ProductImageUpload? = null
+
+    private val productImagePicker =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri == null) return@registerForActivityResult
+            handleSelectedProductImage(uri)
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -85,6 +98,14 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
         setupBackHandling()
         setupFieldWatchers()
         binding.productFormRetryButton.setOnClickListener { viewModel.retry() }
+        binding.productSelectImageButton.setOnClickListener {
+            productImagePicker.launch("image/*")
+        }
+        binding.productRemoveImageButton.setOnClickListener {
+            selectedImageUpload = null
+            viewModel.onImageSelectionCleared()
+            binding.productImagePreview.setImageResource(android.R.drawable.ic_menu_gallery)
+        }
         binding.productFormSaveButton.setOnClickListener { viewModel.save() }
         collectUi()
         collectEvents()
@@ -138,6 +159,9 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
         }
         binding.productUnitInput.doAfterTextChanged {
             if (!suppressFieldWatchers) viewModel.onUnitChanged(it?.toString().orEmpty())
+        }
+        binding.productImageUrlInput.doAfterTextChanged {
+            if (!suppressFieldWatchers) viewModel.onImageUrlChanged(it?.toString().orEmpty())
         }
 
         binding.productCategoryInput.setOnItemClickListener { parent, _, position, _ ->
@@ -223,6 +247,22 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
         if (binding.productUnitInput.text?.toString() != state.unit) {
             binding.productUnitInput.setText(state.unit)
         }
+        if (binding.productImageUrlInput.text?.toString() != state.imageUrl) {
+            binding.productImageUrlInput.setText(state.imageUrl)
+        }
+        if (selectedImageUpload == null && state.imageUrl.isNotBlank()) {
+            val previewUrl = if (state.imageUrl.startsWith("/")) {
+                AppConfig.baseUrl.removeSuffix("/api/v1") + state.imageUrl
+            } else {
+                state.imageUrl
+            }
+            binding.productImagePreview.load(previewUrl) {
+                crossfade(true)
+                placeholder(android.R.drawable.ic_menu_gallery)
+                error(android.R.drawable.ic_menu_gallery)
+            }
+        }
+        binding.productImageFileNameText.text = state.imageFileName ?: getString(R.string.admin_product_form_no_photo)
         suppressFieldWatchers = false
 
         renderCategoryOptions(state)
@@ -254,6 +294,43 @@ class ProductFormScreen : Fragment(R.layout.fragment_admin_product_form) {
             suppressCategorySelectionCallback = true
             binding.productCategoryInput.setText(selectedName, false)
             suppressCategorySelectionCallback = false
+        }
+    }
+
+    private fun handleSelectedProductImage(uri: Uri) {
+        val resolver = requireContext().contentResolver
+        val contentType = resolver.getType(uri)?.lowercase().orEmpty()
+        if (contentType !in setOf("image/jpeg", "image/png", "image/webp")) {
+            UiFeedback.showSnackbar(binding.root, "Please select a JPG, PNG, or WebP image.")
+            return
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val bytes = resolver.openInputStream(uri)?.use { it.readBytes() }
+                    ?: throw IllegalStateException("Unable to read the selected image.")
+                if (bytes.isEmpty()) throw IllegalStateException("Selected image is empty.")
+                if (bytes.size > 5 * 1024 * 1024) {
+                    UiFeedback.showSnackbar(binding.root, "Product photo must be 5 MB or smaller.")
+                    return@launch
+                }
+                val upload = ProductImageUpload(
+                    bytes = bytes,
+                    fileName = "product_${System.currentTimeMillis()}.${
+                        when (contentType) {
+                            "image/png" -> "png"
+                            "image/webp" -> "webp"
+                            else -> "jpg"
+                        }
+                    }",
+                    contentType = contentType
+                )
+                selectedImageUpload = upload
+                viewModel.onImageSelected(upload)
+                binding.productImagePreview.setImageURI(uri)
+                binding.productImageFileNameText.text = upload.fileName
+            } catch (t: Throwable) {
+                UiFeedback.showSnackbar(binding.root, t.message ?: "Unable to select product photo.")
+            }
         }
     }
 
