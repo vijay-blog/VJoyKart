@@ -99,27 +99,27 @@
     },
     {
       "name": "geocoding",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding-5.0.0",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding-3.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "geocoding_android",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_android-3.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "geocoding_ios",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_ios-3.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
-      "name": "geocoding_android",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_android-5.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.12"
-    },
-    {
-      "name": "geocoding_darwin",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_darwin-1.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "3.8"
-    },
-    {
       "name": "geocoding_platform_interface",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_platform_interface-5.0.0",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding_platform_interface-3.2.0",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "2.12"
     },
     {
       "name": "geolocator",
@@ -141,7 +141,7 @@
     },
     {
       "name": "geolocator_platform_interface",
-      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_platform_interface-4.3.0",
+      "rootUri": "file:///C:/Users/Raghupathi/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_platform_interface-4.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },

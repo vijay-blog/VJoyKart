@@ -10,14 +10,13 @@ import 'package:geocoding_android/geocoding_android.dart' as geocoding_android;
 import 'package:geolocator_android/geolocator_android.dart' as geolocator_android;
 import 'package:shared_preferences_android/shared_preferences_android.dart' as shared_preferences_android;
 import 'package:url_launcher_android/url_launcher_android.dart' as url_launcher_android;
-import 'package:geocoding_darwin/geocoding_darwin.dart' as geocoding_darwin;
+import 'package:geocoding_ios/geocoding_ios.dart' as geocoding_ios;
 import 'package:geolocator_apple/geolocator_apple.dart' as geolocator_apple;
 import 'package:shared_preferences_foundation/shared_preferences_foundation.dart' as shared_preferences_foundation;
 import 'package:url_launcher_ios/url_launcher_ios.dart' as url_launcher_ios;
 import 'package:path_provider_linux/path_provider_linux.dart' as path_provider_linux;
 import 'package:shared_preferences_linux/shared_preferences_linux.dart' as shared_preferences_linux;
 import 'package:url_launcher_linux/url_launcher_linux.dart' as url_launcher_linux;
-import 'package:geocoding_darwin/geocoding_darwin.dart' as geocoding_darwin;
 import 'package:geolocator_apple/geolocator_apple.dart' as geolocator_apple;
 import 'package:shared_preferences_foundation/shared_preferences_foundation.dart' as shared_preferences_foundation;
 import 'package:url_launcher_macos/url_launcher_macos.dart' as url_launcher_macos;
@@ -32,7 +31,7 @@ class _PluginRegistrant {
   static void register() {
     if (Platform.isAndroid) {
       try {
-        geocoding_android.GeocodingAndroidFactory.registerWith();
+        geocoding_android.GeocodingAndroid.registerWith();
       } catch (err) {
         print(
           '`geocoding_android` threw an error: $err. '
@@ -69,10 +68,10 @@ class _PluginRegistrant {
 
     } else if (Platform.isIOS) {
       try {
-        geocoding_darwin.GeocodingDarwinFactory.registerWith();
+        geocoding_ios.GeocodingIOS.registerWith();
       } catch (err) {
         print(
-          '`geocoding_darwin` threw an error: $err. '
+          '`geocoding_ios` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
       }
@@ -133,15 +132,6 @@ class _PluginRegistrant {
       }
 
     } else if (Platform.isMacOS) {
-      try {
-        geocoding_darwin.GeocodingDarwinFactory.registerWith();
-      } catch (err) {
-        print(
-          '`geocoding_darwin` threw an error: $err. '
-          'The app may not function as expected until you remove this plugin from pubspec.yaml'
-        );
-      }
-
       try {
         geolocator_apple.GeolocatorApple.registerWith();
       } catch (err) {
