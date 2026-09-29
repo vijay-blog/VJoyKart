@@ -245,57 +245,6 @@ class _HomeTab extends StatelessWidget {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(18, 20, 18, 8),
-              sliver: SliverToBoxAdapter(
-                child: Row(
-                  children: [
-                    const Text('Shop by Fashion', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-                    const Spacer(),
-                    Text('All styles', style: TextStyle(color: AppTheme.green, fontWeight: FontWeight.w800)),
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 116,
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _fashionCategories.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 10),
-                  itemBuilder: (_, index) {
-                    final item = _fashionCategories[index];
-                    return InkWell(
-                      onTap: () => _openCategory(context, item),
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        width: 82,
-                        padding: const EdgeInsets.fromLTRB(6, 7, 6, 7),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.black.withOpacity(.05)),
-                        ),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(item.asset, fit: BoxFit.cover),
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            SliverPadding(
               padding: const EdgeInsets.fromLTRB(18, 20, 18, 10),
               sliver: SliverToBoxAdapter(
                 child: Container(
@@ -325,11 +274,8 @@ class _HomeTab extends StatelessWidget {
                 ),
               ),
             ),
-            if (catalog.products.isNotEmpty)
-              _productSection('Trending Fashion', catalog.products.take(12).toList()),
-            if (men.isNotEmpty) _productSection("Men's Wear", men),
-            if (women.isNotEmpty) _productSection("Women's Wear", women),
-            if (kids.isNotEmpty) _productSection('Kids & Girls Wear', kids),
+            // Upcoming departments are intentionally placed immediately after the
+            // new-launch clothing offer and before all product collections.
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(18, 24, 18, 10),
               sliver: SliverToBoxAdapter(
@@ -368,6 +314,11 @@ class _HomeTab extends StatelessWidget {
                 ),
               ),
             ),
+            if (catalog.products.isNotEmpty)
+              _productSection('Trending Fashion', catalog.products.take(12).toList()),
+            if (men.isNotEmpty) _productSection("Men's Wear", men),
+            if (women.isNotEmpty) _productSection("Women's Wear", women),
+            if (kids.isNotEmpty) _productSection('Kids & Girls Wear', kids),
             if (catalog.loading)
               const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator())))
             else if (catalog.products.isEmpty && catalog.error != null)
