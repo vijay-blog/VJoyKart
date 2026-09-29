@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../screens/product_detail_screen.dart';
+import 'catalog_image.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -31,12 +32,10 @@ class ProductCard extends StatelessWidget {
                                   color: const Color(0xfff3f5ff),
                                   borderRadius: BorderRadius.circular(14)),
                               clipBehavior: Clip.antiAlias,
-                              child: Image.asset(product.imageAsset,
+                              child: CatalogImage(
+                                  source: product.imageAsset,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                      Icons.image_not_supported_outlined,
-                                      size: 48,
-                                      color: Colors.grey)))),
+                                  iconSize: 48))),
                       const SizedBox(height: 8),
                       if (product.discount >= 1)
                         Align(

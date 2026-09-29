@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'catalog_image.dart';
 
 class HomeCategorySlider extends StatelessWidget {
   final List<Map<String, String>> categories;
@@ -37,11 +38,10 @@ class HomeCategorySlider extends StatelessWidget {
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.asset(
-                        image,
+                      child: CatalogImage(
+                        source: image,
                         fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.grid_view_rounded, size: 26),
+                        iconSize: 26,
                       ),
                     ),
                   ),

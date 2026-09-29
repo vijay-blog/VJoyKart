@@ -41,7 +41,7 @@ class OrderSuccessScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: OutlinedButton(
-                  onPressed: () => Navigator.pushReplacement(
+                  onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (_) => OrderDetailScreen(order: order)),
@@ -54,8 +54,10 @@ class OrderSuccessScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: FilledButton(
-                  onPressed: () =>
-                      Navigator.popUntil(context, (r) => r.isFirst),
+                  onPressed: () => Navigator.popUntil(
+                    context,
+                    (route) => route.isFirst,
+                  ),
                   child: const Text('CONTINUE SHOPPING'),
                 ),
               ),

@@ -4,14 +4,19 @@ import '../providers/catalog_provider.dart';
 import '../widgets/product_card.dart';
 
 class CategoryScreen extends StatelessWidget {
-  final String category;
-  const CategoryScreen({super.key, required this.category});
+  final String categoryId;
+  final String categoryName;
+  const CategoryScreen({
+    super.key,
+    required this.categoryId,
+    required this.categoryName,
+  });
   @override
   Widget build(BuildContext c) {
-    final list = c.watch<CatalogProvider>().search('', category: category);
+    final list = c.watch<CatalogProvider>().search('', categoryId: categoryId);
     return Scaffold(
         appBar: AppBar(
-            title: Text(category,
+            title: Text(categoryName,
                 style: const TextStyle(fontWeight: FontWeight.w900))),
         body: list.isEmpty
             ? const Center(

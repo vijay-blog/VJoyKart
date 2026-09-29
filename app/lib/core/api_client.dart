@@ -58,17 +58,17 @@ class ApiClient {
       return _handleResponse(response);
     } on TimeoutException {
       throw ApiException(
-        'Unable to connect to NexaMart. Please check your internet connection.',
+        'Unable to connect to VjoyKart. Please check your internet connection.',
         0,
       );
     } on SocketException {
       throw ApiException(
-        'Unable to connect to NexaMart. Please check your internet connection.',
+        'Unable to connect to VjoyKart. Please check your internet connection.',
         0,
       );
     } on http.ClientException {
       throw ApiException(
-        'Unable to connect to NexaMart. Please check your internet connection.',
+        'Unable to connect to VjoyKart. Please check your internet connection.',
         0,
       );
     } on FormatException {
@@ -79,7 +79,7 @@ class ApiClient {
     } catch (e) {
       if (e is ApiException) rethrow;
       throw ApiException(
-        'Unable to connect to NexaMart. Please check your internet connection.',
+        'Unable to connect to VjoyKart. Please check your internet connection.',
         0,
       );
     }
@@ -111,9 +111,7 @@ class ApiClient {
             )
             .timeout(AppConfig.timeout);
       case HttpMethod.delete:
-        return _client
-            .delete(uri, headers: headers)
-            .timeout(AppConfig.timeout);
+        return _client.delete(uri, headers: headers).timeout(AppConfig.timeout);
     }
   }
 
@@ -123,7 +121,17 @@ class ApiClient {
       if (response.body.isEmpty) return null;
       return jsonDecode(response.body);
     }
-    throw ApiException(_messageForStatusCode(code), code);
+    String message = _messageForStatusCode(code);
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map) {
+        final candidate = decoded['message'] ?? decoded['error'] ?? decoded['detail'];
+        if (candidate != null && candidate.toString().trim().isNotEmpty) {
+          message = candidate.toString();
+        }
+      }
+    } catch (_) {}
+    throw ApiException(message, code);
   }
 
   String _messageForStatusCode(int code) {
@@ -145,10 +153,10 @@ class ApiClient {
       case 500:
       case 502:
       case 503:
-        return 'NexaMart is temporarily unavailable. Please try again shortly.';
+        return 'VjoyKart is temporarily unavailable. Please try again shortly.';
       default:
         return code >= 500
-            ? 'NexaMart is temporarily unavailable. Please try again shortly.'
+            ? 'VjoyKart is temporarily unavailable. Please try again shortly.'
             : 'Unable to complete your request right now.';
     }
   }

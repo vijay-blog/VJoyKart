@@ -12,6 +12,7 @@ import com.daily.nexamartpartner.features.admin.data.repository.defaultProductsQ
 import com.daily.nexamartpartner.features.admin.data.source.ProductManagementRemoteDataSource
 import com.daily.nexamartpartner.features.admin.domain.model.ProductAdminAction
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDraft
+import com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
 import com.daily.nexamartpartner.features.admin.domain.model.ProductStatus
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -274,6 +275,13 @@ class ProductManagementRepositoryImplTest {
         override suspend fun getCategoryOptions() = categoryResult
         override suspend fun createProduct(draft: ProductDraft) = createResult
         override suspend fun updateProduct(productId: String, draft: ProductDraft) = updateResult
+        override suspend fun uploadProductImage(
+            productId: String,
+            image: ProductImageUpload
+        ): AppResult<ProductDetailsDto> {
+            TODO("Not yet implemented")
+        }
+
         override suspend fun performProductAction(productId: String, action: ProductAdminAction) = actionResult
     }
 }

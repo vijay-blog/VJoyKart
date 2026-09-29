@@ -38,7 +38,7 @@ android {
         create("prod") {
             dimension = "environment"
             buildConfigField("String", "APP_ENV", "\"production\"")
-            buildConfigField("String", "BASE_URL", "\"${project.findProperty("nexamartProdApiUrl") ?: "https://api.nexamart.example.com/api/v1/"}\"")
+            buildConfigField("String", "BASE_URL", "\"${project.findProperty("nexamartProdApiUrl") ?: "https://zeptopluse-production.up.railway.app/api/v1/"}\"")
         }
     }
 
@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.coil)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.security.crypto)
     implementation(libs.retrofit)

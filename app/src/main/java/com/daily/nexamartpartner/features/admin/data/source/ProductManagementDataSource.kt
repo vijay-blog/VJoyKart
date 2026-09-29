@@ -12,6 +12,9 @@ import com.daily.nexamartpartner.features.admin.domain.model.ProductAdminAction
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDraft
 import com.daily.nexamartpartner.features.admin.domain.model.ProductsQuery
 import retrofit2.Response
+import retrofit2.http.Multipart
+import retrofit2.http.Part
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -44,6 +47,14 @@ interface ProductManagementApi {
         @Body body: Map<String, String>
     ): Response<ProductDetailsDto>
 
+
+    @Multipart
+    @POST
+    suspend fun uploadProductImage(
+        @Url path: String,
+        @Part image: MultipartBody.Part
+    ): Response<ProductDetailsDto>
+
     @PATCH
     suspend fun performProductAction(
         @Url path: String,
@@ -57,6 +68,7 @@ interface ProductManagementRemoteDataSource {
     suspend fun getCategoryOptions(): AppResult<List<CategoryOptionDto>>
     suspend fun createProduct(draft: ProductDraft): AppResult<ProductDetailsDto>
     suspend fun updateProduct(productId: String, draft: ProductDraft): AppResult<ProductDetailsDto>
+    suspend fun uploadProductImage(productId: String, image: com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload): AppResult<ProductDetailsDto>
     suspend fun performProductAction(productId: String, action: ProductAdminAction): AppResult<Unit>
 }
 
@@ -100,6 +112,22 @@ class ProductManagementRemoteDataSourceImpl(
         val body = contract.buildUpdateProductBody(draft)
             ?: return contractMissing("Product update request contract is not confirmed yet.")
         return executor.execute { api.updateProduct(path, body) }
+    }
+
+
+
+    override suspend fun uploadProductImage(
+        productId: String,
+        image: com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
+    ): AppResult<ProductDetailsDto> {
+        val path = contract.resolvePath(contract.productImagePathTemplate, productId)
+            ?: return contractMissing("Product image upload API contract is not confirmed yet.")
+        val body = okhttp3.RequestBody.create(
+            okhttp3.MediaType.parse(image.contentType),
+            image.bytes
+        )
+        val part = MultipartBody.Part.createFormData("image", image.fileName, body)
+        return executor.execute { api.uploadProductImage(path, part) }
     }
 
     override suspend fun performProductAction(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/app_theme.dart';
 import 'providers/cart_provider.dart';
 import 'providers/catalog_provider.dart';
@@ -10,18 +10,20 @@ import 'screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  if (!prefs.containsKey('nm.guestCustomerId')) {
-    await prefs.setString(
-      'nm.guestCustomerId',
-      'guest_${DateTime.now().millisecondsSinceEpoch}',
-    );
-  }
-  runApp(const NexaMartApp());
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Color(0xFFF6F7FC),
+    systemNavigationBarColor: Colors.white,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarDividerColor: Colors.transparent,
+  ));
+  runApp(const VJoyKartApp());
 }
 
-class NexaMartApp extends StatelessWidget {
-  const NexaMartApp({super.key});
+class VJoyKartApp extends StatelessWidget {
+  const VJoyKartApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -33,8 +35,10 @@ class NexaMartApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'NexaMart',
+        title: 'VJoyKart',
         theme: AppTheme.theme,
+        darkTheme: AppTheme.theme,
+        themeMode: ThemeMode.light,
         home: const SplashScreen(),
       ),
     );

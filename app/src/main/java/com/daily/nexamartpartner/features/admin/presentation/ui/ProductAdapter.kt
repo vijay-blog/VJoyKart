@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.daily.nexamartpartner.R
 import com.daily.nexamartpartner.core.format.ValueFormatter
 import com.daily.nexamartpartner.databinding.ItemProductSummaryBinding
@@ -43,10 +44,14 @@ class ProductAdapter(
             } ?: context.getString(R.string.admin_dashboard_amount_unavailable)
             binding.productStatusText.text = item.status.backendValue
 
-            // No approved image-loading dependency exists yet, so a static placeholder icon
-            // is always shown instead of attempting to load `item.imageUrl`.
             binding.productImagePlaceholder.contentDescription =
                 context.getString(R.string.cd_product_image_unavailable)
+            binding.productImagePlaceholder.load(item.imageUrl) {
+                crossfade(true)
+                placeholder(android.R.drawable.ic_menu_gallery)
+                error(android.R.drawable.ic_menu_report_image)
+                fallback(android.R.drawable.ic_menu_gallery)
+            }
 
             binding.root.contentDescription = context.getString(
                 R.string.cd_product_summary_card,

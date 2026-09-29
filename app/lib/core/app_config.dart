@@ -1,22 +1,36 @@
 class AppConfig {
   static const String _apiPrefix = '/api/v1';
-  static const String _defaultApiBaseUrl = 'https://zeptopluse-production.up.railway.app$_apiPrefix';
+  static const String _defaultApiBaseUrl =
+      'https://zeptopluse-production.up.railway.app$_apiPrefix';
   static const bool _isReleaseBuild = bool.fromEnvironment('dart.vm.product');
   static final String apiBaseUrl = _normalizeBaseUrl(
-    String.fromEnvironment('API_BASE_URL', defaultValue: _defaultApiBaseUrl),
+    const String.fromEnvironment(
+      'API_BASE_URL',
+      defaultValue: _defaultApiBaseUrl,
+    ),
   );
+
+  // Product image binaries are served by the catalog/image backend. Keep this
+  // separate from the customer API so catalog images can continue to render
+  // when the customer API and Partner catalog are deployed independently.
+  static const String catalogImageBaseUrl =
+      'https://nexamartpartner-production.up.railway.app';
 
   static String? get runtimeConfigurationIssue {
     final value = apiBaseUrl.toLowerCase();
     if (!_isReleaseBuild) return null;
     if (value.isEmpty || !value.startsWith('https://')) {
-      return 'NexaMart is not configured for production yet.';
+      return 'VjoyKart is not configured for production yet.';
     }
+    final host = Uri.tryParse(value)?.host ?? '';
+    final private172 = RegExp(r'^172\.(1[6-9]|2\d|3[01])\.').hasMatch(host);
     if (value.contains('railway.internal') ||
-        value.contains('10.0.2.2') ||
-        value.contains('127.0.0.1') ||
-        value.contains('localhost')) {
-      return 'NexaMart is not configured for production yet.';
+        host.startsWith('10.') ||
+        host.startsWith('192.168.') ||
+        private172 ||
+        host == '127.0.0.1' ||
+        host == 'localhost') {
+      return 'VjoyKart is not configured for production yet.';
     }
     return null;
   }
