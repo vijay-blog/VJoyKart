@@ -18,15 +18,18 @@ class CatalogProvider extends ChangeNotifier {
     error = null;
     notifyListeners();
     try {
-      final results = await Future.wait([
-        _fetchAll('/catalog/products'),
-        _fetchAll('/catalog/categories'),
-      ]);
-      products = results[0]
+      // The first launch is fashion-only. Categories are now local UI
+      // navigation, so the customer app does not depend on the legacy
+      // /catalog/categories endpoint.
+      final productRows = await _fetchAll('/catalog/products');
+      products = productRows
           .map(Product.fromJson)
           .where(
             (product) =>
-                product.id > 0 && product.name.isNotEmpty && product.available,
+                product.id > 0 &&
+                product.name.isNotEmpty &&
+                product.available &&
+                _isFashionProduct(product),
           )
           .toList();
 
@@ -39,12 +42,7 @@ class CatalogProvider extends ChangeNotifier {
         products = await _hydratePartnerImages(products);
       }
 
-      categories = results[1]
-          .map(CategoryItem.fromJson)
-          .where(
-            (category) => category.id.isNotEmpty && category.name.isNotEmpty,
-          )
-          .toList();
+      categories = [];
     } catch (e) {
       products = [];
       categories = [];
@@ -156,9 +154,36 @@ class CatalogProvider extends ChangeNotifier {
         .map(Product.fromJson)
         .where(
           (product) =>
-              product.id > 0 && product.name.isNotEmpty && product.available,
+              product.id > 0 &&
+              product.name.isNotEmpty &&
+              product.available &&
+              _isFashionProduct(product),
         )
         .toList();
+  }
+
+  bool _isFashionProduct(Product product) {
+    final text = [
+      product.name,
+      product.categoryName,
+      product.description,
+      product.brand,
+      product.unit,
+      product.size,
+      product.attributes.values.join(' '),
+    ].join(' ').toLowerCase();
+
+    const fashionKeywords = [
+      'cloth', 'clothing', 'apparel', 'fashion', 'wear', 'men', 'mens',
+      'man', 'women', 'womens', 'woman', 'boy', 'boys', 'girl', 'girls',
+      'kid', 'kids', 't-shirt', 'tshirt', 'shirt', 'jeans', 'trouser',
+      'pant', 'pants', 'dress', 'saree', 'sari', 'kurti', 'kurta', 'top',
+      'skirt', 'shorts', 'jacket', 'hoodie', 'sweatshirt', 'sweater',
+      'coat', 'blazer', 'ethnic', 'western', 'innerwear', 'underwear',
+      'nightwear', 'sleepwear', 'sportswear', 'winterwear', 'leggings',
+      'palazzo', 'salwar', 'lehenga', 'dupatta', 'blouse', 'track pant',
+    ];
+    return fashionKeywords.any(text.contains);
   }
 
   List<Product> search(String query, {String? categoryId}) {

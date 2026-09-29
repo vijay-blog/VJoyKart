@@ -29,5 +29,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/categories/
+    - assets/images/fashion_banners/
     - assets/images/products/
     - assets/images/vjoykart_icon.png
