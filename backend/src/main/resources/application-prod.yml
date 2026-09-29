@@ -15,6 +15,8 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+    # Production DB already has newer migrations recorded; apply older pending ones.
+    out-of-order: true
     ignore-migration-patterns:
       - "*:missing"
       - "*:future"

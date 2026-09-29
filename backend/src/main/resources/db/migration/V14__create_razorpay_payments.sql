@@ -1,3 +1,21 @@
+-- A legacy `payments` table may exist from the old marketplace schema. Its foreign key
+-- points at the renamed legacy orders table, so archive it before creating the new one.
+SET @sql = (
+  SELECT IF(
+    EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'payments')
+      AND NOT EXISTS(
+        SELECT 1 FROM information_schema.key_column_usage
+        WHERE table_schema = DATABASE() AND table_name = 'payments'
+          AND column_name = 'order_id' AND referenced_table_name = 'orders')
+      AND NOT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'legacy_marketplace_payments'),
+    'RENAME TABLE payments TO legacy_marketplace_payments',
+    'SELECT 1'
+  )
+);
+PREPARE statement FROM @sql;
+EXECUTE statement;
+DEALLOCATE PREPARE statement;
+
 CREATE TABLE IF NOT EXISTS payments (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   order_id BIGINT NOT NULL,
@@ -15,4 +33,14 @@ CREATE TABLE IF NOT EXISTS payments (
   CONSTRAINT uk_payment_gateway_order UNIQUE (gateway_order_id)
 );
 
-CREATE INDEX idx_payments_order ON payments(order_id);
+SET @sql = (
+  SELECT IF(
+    EXISTS(SELECT 1 FROM information_schema.statistics
+           WHERE table_schema = DATABASE() AND table_name = 'payments' AND index_name = 'idx_payments_order'),
+    'SELECT 1',
+    'CREATE INDEX idx_payments_order ON payments(order_id)'
+  )
+);
+PREPARE statement FROM @sql;
+EXECUTE statement;
+DEALLOCATE PREPARE statement;
