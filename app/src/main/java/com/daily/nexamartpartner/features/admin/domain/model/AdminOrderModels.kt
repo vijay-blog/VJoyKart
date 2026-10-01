@@ -71,7 +71,9 @@ data class DeliveryInfo(
     val status: String?,
     val partnerName: String?,
     val assignedAt: String?,
-    val partnerId: String? = null
+    val partnerId: String? = null,
+    val partnerPhone: String? = null,
+    val assignmentStatus: String? = null
 )
 
 data class OrderTimelineEntry(

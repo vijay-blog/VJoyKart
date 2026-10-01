@@ -14,7 +14,9 @@ import com.daily.nexamartpartner.features.admin.domain.model.ProductsQuery
 import retrofit2.Response
 import retrofit2.http.Multipart
 import retrofit2.http.Part
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -122,10 +124,7 @@ class ProductManagementRemoteDataSourceImpl(
     ): AppResult<ProductDetailsDto> {
         val path = contract.resolvePath(contract.productImagePathTemplate, productId)
             ?: return contractMissing("Product image upload API contract is not confirmed yet.")
-        val body = okhttp3.RequestBody.create(
-            okhttp3.MediaType.parse(image.contentType),
-            image.bytes
-        )
+        val body = image.bytes.toRequestBody(image.contentType.toMediaTypeOrNull())
         val part = MultipartBody.Part.createFormData("image", image.fileName, body)
         return executor.execute { api.uploadProductImage(path, part) }
     }

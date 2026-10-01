@@ -24,12 +24,13 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         super.onViewCreated(view,savedInstanceState); _binding=FragmentRegisterBinding.bind(view)
         binding.nameInput.doAfterTextChanged{vm.onNameChanged(it?.toString().orEmpty())}
         binding.emailInput.doAfterTextChanged{vm.onEmailChanged(it?.toString().orEmpty())}
+        binding.phoneInput.doAfterTextChanged{vm.onPhoneChanged(it?.toString().orEmpty())}
         binding.passwordInput.doAfterTextChanged{vm.onPasswordChanged(it?.toString().orEmpty())}
         binding.confirmPasswordInput.doAfterTextChanged{vm.onConfirmPasswordChanged(it?.toString().orEmpty())}
         binding.createAccountButton.setOnClickListener{vm.submit()}
         binding.backToLoginButton.setOnClickListener{findNavController().popBackStack()}
         viewLifecycleOwner.lifecycleScope.launch{viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){vm.uiState.collect{state->
-            binding.nameLayout.error=state.nameError; binding.emailLayout.error=state.emailError; binding.passwordLayout.error=state.passwordError; binding.confirmPasswordLayout.error=state.confirmPasswordError
+            binding.nameLayout.error=state.nameError; binding.emailLayout.error=state.emailError; binding.phoneLayout.error=state.phoneError; binding.passwordLayout.error=state.passwordError; binding.confirmPasswordLayout.error=state.confirmPasswordError
             binding.createAccountButton.isEnabled=!state.isSubmitting
             binding.createAccountButton.text=if(state.isSubmitting) "Creating account…" else "Create account"
             binding.errorText.text=state.formError.orEmpty(); binding.errorText.visibility=if(state.formError.isNullOrBlank()) View.GONE else View.VISIBLE

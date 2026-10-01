@@ -18,18 +18,31 @@ public final class ApiModels{private ApiModels(){}
  public record CreateOrderRequest(@NotEmpty List<OrderItemRequest> items,@NotNull AddressRequest address,PaymentMethod paymentMethod){}
  public record PaymentCreateOrderResponse(Long paymentId,Long orderId,String keyId,String gateway,String gatewayOrderId,BigDecimal amount,String currency){}
  public record PaymentVerifyRequest(@NotNull Long orderId,@NotBlank String gatewayOrderId,@NotBlank String gatewayPaymentId,@NotBlank String gatewaySignature){}
- public record ProfileUpdate(String name,String email,String vehicleType,String vehicleNumber,String licenseReference){}
+ public record ProfileUpdate(String name,String email,@Pattern(regexp="^\\+?[0-9]{10,13}$",message="must be a valid mobile number") String phone,String vehicleType,String vehicleNumber,String licenseReference){}
  public record AvailabilityRequest(boolean available){}
  public record PageResponse<T>(List<T> content,int page,int pageSize,int totalPages,long totalElements,boolean hasNextPage,int number,int size,boolean last){public PageResponse(List<T> content,int page,int pageSize,int totalPages,long totalElements,boolean hasNextPage){this(content,page,pageSize,totalPages,totalElements,hasNextPage,page,pageSize,!hasNextPage);}}
  public record OrderItemResponse(Long id,Long productId,String productName,BigDecimal unitPrice,int quantity,BigDecimal lineTotal){}
  public record PaymentInfoDto(String method,String status,String transactionReference){}
  public record OrderTotalsDto(String subtotal,String deliveryFee,String discount,String tax,String grandTotal,String currencyCode){}
- public record DeliveryInfoDto(String status,String partnerName,String assignedAt,String partnerId){}
+ public record DeliveryInfoDto(String status,String partnerName,String assignedAt,String partnerId,String partnerPhone,String assignmentStatus){}
+ /** Only the delivery-partner details a customer needs. Never add email, documents, tokens or IDs proofs here. */
+ public record DeliveryPartnerContact(String id,String name,String phone){}
+ public record StoreDto(String name,double latitude,double longitude,String mapsUrl,String address){}
+ public record GeoPointDto(Double latitude,Double longitude){}
+ /** state is COMPLETED, CURRENT or PENDING. */
+ public record DeliveryStepDto(String status,String label,String state,String timestamp){}
+ public record OrderTrackingResponse(String orderId,String orderStatus,String paymentMethod,String paymentStatus,String totalAmount,String currencyCode,String deliveryStatus,String deliveryStatusLabel,String assignmentStatus,String assignedAt,DeliveryPartnerContact deliveryPartner,StoreDto store,String deliveryAddress,GeoPointDto deliveryLocation,List<DeliveryStepDto> progress,String updatedAt){}
+ public record DeliveryStatusUpdateRequest(@NotBlank String status){}
+ public record LocationUpdateRequest(@NotNull @DecimalMin("-90.0") @DecimalMax("90.0") Double latitude,@NotNull @DecimalMin("-180.0") @DecimalMax("180.0") Double longitude,Double accuracyMeters){}
+ public record LocationUpdateResponse(boolean accepted,Instant recordedAt,double distanceFromStoreKm,long maxAgeSeconds){}
+ public record PartnerLoginRequest(String identifier,String email,@NotBlank String password){public String login(){return identifier!=null&&!identifier.isBlank()?identifier.trim():email==null?"":email.trim();}}
+ public record PartnerRegisterRequest(@NotBlank String name,@Email @NotBlank String email,@NotBlank @Pattern(regexp="^\\+?[0-9]{10,13}$",message="must be a valid mobile number") String phone,@NotBlank @Size(min=8,max=100) String password){}
+ public record DeliveryNotificationPage(List<NotificationResponse> items,int page,int pageSize,int totalPages,long totalElements,boolean hasNextPage,long unreadCount){}
  public record OrderTimelineDto(String status,String timestamp){}
- public record OrderResponse(String orderId,String customerName,String customerPhone,String address,String totalAmount,String currencyCode,String status,String paymentStatus,String assignedAt,String createdAt,Integer itemCount,String deliveryStatus,UserResponse customer,List<OrderItemResponse> items,PaymentInfoDto payment,OrderTotalsDto totals,DeliveryInfoDto delivery,List<OrderTimelineDto> timeline,List<String> allowedTransitions,Boolean canCancel,UserResponse deliveryPartner,List<String> allowedActions,Boolean proofOfDeliveryRequired,String proofOfDeliveryStatus,String proofOfDeliveryUrl){}
+ public record OrderResponse(String orderId,String customerName,String customerPhone,String address,String totalAmount,String currencyCode,String status,String paymentStatus,String assignedAt,String createdAt,Integer itemCount,String deliveryStatus,UserResponse customer,List<OrderItemResponse> items,PaymentInfoDto payment,OrderTotalsDto totals,DeliveryInfoDto delivery,List<OrderTimelineDto> timeline,List<String> allowedTransitions,Boolean canCancel,DeliveryPartnerContact deliveryPartner,List<String> allowedActions,Boolean proofOfDeliveryRequired,String proofOfDeliveryStatus,String proofOfDeliveryUrl,String deliveryStatusLabel,String assignmentStatus,StoreDto store,GeoPointDto deliveryLocation,List<DeliveryStepDto> deliveryProgress){}
  public record AdminRecentOrder(String orderId,String customerName,Double amount,String status,String createdAt){}
  public record DeliveryDashboardResponse(Long activeOrders,Long assignedOrders,Long pickedUpOrders,Long outForDeliveryOrders,Long completedToday,String todayEarnings,String currencyCode,String availability,List<DeliveryOrderSummary> recentOrders){}
- public record DeliveryOrderSummary(String orderId,String customerName,String customerPhone,String address,String totalAmount,String currencyCode,String status,String paymentStatus,String assignedAt,String createdAt,String amount){}
+ public record DeliveryOrderSummary(String orderId,String customerName,String customerPhone,String address,String totalAmount,String currencyCode,String status,String paymentStatus,String assignedAt,String createdAt,String amount,String deliveryStatus,String deliveryStatusLabel,String pickupName){}
  public record CategoryResponse(String categoryId,String name,String description,String imageUrl,boolean active,int productCount,int sortOrder,Instant createdAt,Instant updatedAt,List<String> allowedActions){}
  public record ProductResponse(String productId,String name,String description,String categoryId,String categoryName,String price,String discountedPrice,String discountAmount,String discountPercent,String currencyCode,Integer stock,String sku,String unit,String status,String availability,String imageUrl,Instant createdAt,Instant updatedAt,List<String> allowedActions){}
  public record CustomerResponse(String customerId,String name,String phone,String email,String profileImageUrl,String accountStatus,Instant registeredAt,Instant lastActiveAt,long orderCount,BigDecimal totalSpent,String currencyCode,String defaultAddress,List<String> allowedActions){}

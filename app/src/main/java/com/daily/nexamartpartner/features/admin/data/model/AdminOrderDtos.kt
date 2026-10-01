@@ -70,7 +70,9 @@ data class DeliveryInfoDto(
     @field:Json(name = "status") val status: String?,
     @field:Json(name = "partnerName") val partnerName: String?,
     @field:Json(name = "assignedAt") val assignedAt: String?,
-    @field:Json(name = "partnerId") val partnerId: String? = null
+    @field:Json(name = "partnerId") val partnerId: String? = null,
+    @field:Json(name = "partnerPhone") val partnerPhone: String? = null,
+    @field:Json(name = "assignmentStatus") val assignmentStatus: String? = null
 )
 
 data class OrderTimelineDto(

@@ -90,6 +90,21 @@ class OrderProvider extends ChangeNotifier {
     return order;
   }
 
+  /// Polls the backend tracking endpoint and updates the cached order in place.
+  Future<CustomerOrder> refreshTracking(CustomerOrder order) async {
+    final response = await _api.get('/customer/orders/${order.id}/tracking');
+    if (response is Map<String, dynamic>) {
+      order.applyTracking(response);
+      final index = orders.indexWhere((o) => o.id == order.id);
+      if (index >= 0 && !identical(orders[index], order)) {
+        orders[index].applyTracking(response);
+      }
+      await _persist();
+      notifyListeners();
+    }
+    return order;
+  }
+
   Future<PaymentOrder> createPaymentOrder(CustomerOrder order) async {
     final response = await _api.post('/payments/create-order', {
       'orderId': int.parse(order.id),

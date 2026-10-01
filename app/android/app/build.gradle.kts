@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.vjoykart.customer"
+    namespace = "com.nexamart.customer"
     // geocoding/geolocator Android dependencies require API 34+.
     // Keep compile SDK independent from the Flutter SDK's older default.
     compileSdk = 36
@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.vjoykart.customer"
+        applicationId = "com.nexamart.customer"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -1,6 +1,9 @@
 package com.daily.nexamartpartner.features.delivery.presentation.ui
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -32,6 +35,35 @@ class DeliveryDashboardScreen : Fragment(R.layout.fragment_delivery_dashboard) {
         DeliveryDashboardViewModelFactory(requireContext().appContainer.provideGetDeliveryDashboardUseCase(), requireContext().appContainer.sessionManager)
     }
 
+    private val presencePermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        requireContext().appContainer.deliveryPresenceReporter.start()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        startPresenceReporting()
+        viewModel.refresh()
+    }
+
+    /** Location is needed so the backend can auto-assign nearby orders from the VJoyKart Store. */
+    private fun startPresenceReporting() {
+        val reporter = requireContext().appContainer.deliveryPresenceReporter
+        val missing = buildList {
+            if (!reporter.hasLocationPermission()) {
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+                add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (missing.isEmpty() || permissionsRequested) reporter.start() else {
+            permissionsRequested = true
+            presencePermissions.launch(missing.toTypedArray())
+        }
+    }
+    private var permissionsRequested = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDeliveryDashboardBinding.bind(view)
@@ -42,7 +74,7 @@ class DeliveryDashboardScreen : Fragment(R.layout.fragment_delivery_dashboard) {
         binding.profileButton.setOnClickListener { navigator.navigate(R.id.deliveryProfilePlaceholderFragment) }
         binding.availabilityButton.setOnClickListener { navigator.navigate(R.id.deliveryAvailabilityPlaceholderFragment) }
         binding.notificationsButton.setOnClickListener { navigator.navigate(R.id.deliveryNotificationsPlaceholderFragment) }
-        binding.logoutButton.setOnClickListener { authViewModel.logout() }
+        binding.logoutButton.setOnClickListener { requireContext().appContainer.deliveryPresenceReporter.stop(); authViewModel.logout() }
         binding.retryButton.setOnClickListener { viewModel.retry() }
         binding.deliveryDashboardSwipeRefresh.setOnRefreshListener { viewModel.refresh() }
         collectState()

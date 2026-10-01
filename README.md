@@ -59,7 +59,7 @@ flutter build apk --release
 flutter build appbundle --release
 ```
 
-The customer APK uses application ID `com.vjoykart.customer` and is written to
+The customer APK uses application ID `com.nexamart.customer` and is written to
 `app/build/app/outputs/flutter-apk/app-release.apk`. It opens splash then Home;
 mobile OTP is requested only after the customer continues from Cart to Checkout.
 

@@ -165,18 +165,23 @@ class AppContainer(context: Context) {
     private val deliveryAvailabilityApi: DeliveryAvailabilityApi = retrofit.create(DeliveryAvailabilityApi::class.java)
     private val authRequestContract: AuthRequestContract = ConfigurableAuthRequestContract()
     private val registrationRequestContract = RegistrationRequestContract()
-    private val adminDashboardContract: AdminDashboardContract = PendingBackendAdminDashboardContract()
-    private val adminOrdersContract: AdminOrdersContract = PendingBackendAdminOrdersContract()
-    private val deliveryPartnerContract: DeliveryPartnerContract = PendingBackendDeliveryPartnerContract()
+    private val adminDashboardContract: AdminDashboardContract = com.daily.nexamartpartner.features.admin.data.contract.BackendAdminDashboardContract()
+    private val adminOrdersContract: AdminOrdersContract = com.daily.nexamartpartner.features.admin.data.contract.BackendAdminOrdersContract()
+    private val deliveryPartnerContract: DeliveryPartnerContract = com.daily.nexamartpartner.features.admin.data.contract.BackendDeliveryPartnerContract()
     private val productManagementContract: ProductManagementContract = BackendProductManagementContract()
     private val categoryManagementContract: CategoryManagementContract = BackendCategoryManagementContract()
-    private val customerManagementContract: CustomerManagementContract = PendingBackendCustomerManagementContract()
-    private val deliveryDashboardContract: DeliveryDashboardContract = PendingBackendDeliveryDashboardContract()
-    private val deliveryOrderWorkflowContract: DeliveryOrderWorkflowContract = PendingBackendDeliveryOrderWorkflowContract()
-    private val deliveryEarningsContract: DeliveryEarningsContract = PendingBackendDeliveryEarningsContract()
-    private val deliveryNotificationsContract: DeliveryNotificationsContract = PendingBackendDeliveryNotificationsContract()
-    private val deliveryPartnerProfileContract: DeliveryPartnerProfileContract = PendingBackendDeliveryPartnerProfileContract()
-    private val deliveryAvailabilityContract: DeliveryAvailabilityContract = PendingBackendDeliveryAvailabilityContract()
+    private val customerManagementContract: CustomerManagementContract = com.daily.nexamartpartner.features.admin.customer.data.contract.BackendCustomerManagementContract()
+    private val deliveryDashboardContract: DeliveryDashboardContract = com.daily.nexamartpartner.features.delivery.data.contract.BackendDeliveryDashboardContract()
+    private val deliveryOrderWorkflowContract: DeliveryOrderWorkflowContract = com.daily.nexamartpartner.features.delivery.data.contract.BackendDeliveryOrderWorkflowContract()
+    private val deliveryEarningsContract: DeliveryEarningsContract = com.daily.nexamartpartner.features.delivery.data.contract.BackendDeliveryEarningsContract()
+    private val deliveryNotificationsContract: DeliveryNotificationsContract = com.daily.nexamartpartner.features.delivery.data.contract.BackendDeliveryNotificationsContract()
+    private val deliveryPartnerProfileContract: DeliveryPartnerProfileContract = com.daily.nexamartpartner.features.delivery.data.contract.BackendDeliveryPartnerProfileContract()
+    private val deliveryAvailabilityContract: DeliveryAvailabilityContract = com.daily.nexamartpartner.features.delivery.data.contract.BackendDeliveryAvailabilityContract()
+    val deliveryPresenceReporter = com.daily.nexamartpartner.features.delivery.location.DeliveryPresenceReporter(
+        context.applicationContext,
+        retrofit.create(com.daily.nexamartpartner.features.delivery.location.DeliveryPresenceApi::class.java),
+        sessionManager
+    )
     private val apiCallExecutor = ApiCallExecutor()
 
     private val authRemoteDataSource: AuthRemoteDataSource = AuthRemoteDataSourceImpl(

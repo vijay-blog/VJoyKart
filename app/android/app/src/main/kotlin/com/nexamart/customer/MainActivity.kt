@@ -1,4 +1,4 @@
-package com.vjoykart.customer
+package com.nexamart.customer
 
 import android.os.Bundle
 import android.graphics.Color

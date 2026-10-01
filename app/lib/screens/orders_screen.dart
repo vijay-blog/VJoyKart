@@ -20,8 +20,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<OrderProvider>();
     final all = provider.orders;
-    final active = all.where((o) => !_isFinished(o.status)).toList();
-    final delivered = all.where((o) => _isFinished(o.status)).toList();
+    final active = all.where((o) => !o.isFinished).toList();
+    final delivered = all.where((o) => o.isFinished).toList();
     final orders = filter == 0 ? all : filter == 1 ? active : delivered;
 
     return Container(
@@ -83,8 +83,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   Widget _orderCard(BuildContext context, CustomerOrder order) {
-    final progress = ((order.status.index + 1) / 12).clamp(0.08, 1.0);
-    final finished = _isFinished(order.status);
+    final progress = order.deliveryFraction;
+    final finished = order.isFinished;
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -104,7 +104,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ]),
             const SizedBox(height: 14),
             Row(children: [
-              _statusChip(order.status.label, finished),
+              _statusChip(order.statusLabel, finished),
               const Spacer(),
               Text('${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}', style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600)),
             ]),
@@ -112,7 +112,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: progress, minHeight: 7, backgroundColor: const Color(0xffeceef5), valueColor: const AlwaysStoppedAnimation(AppTheme.green))),
             const SizedBox(height: 9),
             Row(children: [
-              Expanded(child: Text(order.status.label, style: const TextStyle(fontWeight: FontWeight.w700))),
+              Expanded(child: Text(order.hasDeliveryPartner && !finished ? '${order.statusLabel} • ${order.deliveryPartner!.name}' : order.statusLabel, style: const TextStyle(fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis)),
               const Icon(Icons.arrow_forward_ios_rounded, size: 15, color: Colors.black45),
             ]),
           ]),
@@ -134,6 +134,4 @@ class _OrdersScreenState extends State<OrdersScreen> {
     const SizedBox(height: 7),
     const Text('Your VJoyKart orders will appear here.', textAlign: TextAlign.center),
   ])));
-
-  bool _isFinished(OrderStatus status) => status == OrderStatus.delivered || status == OrderStatus.cancelled || status == OrderStatus.returned || status == OrderStatus.deliveryFailed;
 }

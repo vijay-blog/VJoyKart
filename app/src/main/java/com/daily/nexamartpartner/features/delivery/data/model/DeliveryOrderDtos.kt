@@ -22,7 +22,11 @@ data class DeliveryOrderSummaryDto(
     @field:Json(name="paymentStatus") val paymentStatus: String?,
     @field:Json(name="assignedAt") val assignedAt: String?,
     @field:Json(name="createdAt") val createdAt: String?,
-    @field:Json(name="amount") val amount: String?
+    @field:Json(name="amount") val amount: String?,
+    @field:Json(name="deliveryStatus") val deliveryStatus: String? = null,
+    @field:Json(name="deliveryStatusLabel") val deliveryStatusLabel: String? = null,
+    @field:Json(name="pickupName") val pickupName: String? = null,
+    @field:Json(name="store") val store: DeliveryStoreDto? = null
 )
 
 data class DeliveryOrderDetailsDto(
@@ -41,8 +45,23 @@ data class DeliveryOrderDetailsDto(
     @field:Json(name="allowedActions") val allowedActions: List<String>?,
     @field:Json(name="proofOfDeliveryRequired") val proofOfDeliveryRequired: Boolean?,
     @field:Json(name="proofOfDeliveryStatus") val proofOfDeliveryStatus: String?,
-    @field:Json(name="proofOfDeliveryUrl") val proofOfDeliveryUrl: String?
+    @field:Json(name="proofOfDeliveryUrl") val proofOfDeliveryUrl: String?,
+    @field:Json(name="deliveryStatus") val deliveryStatus: String? = null,
+    @field:Json(name="deliveryStatusLabel") val deliveryStatusLabel: String? = null,
+    @field:Json(name="store") val store: DeliveryStoreDto? = null,
+    @field:Json(name="payment") val payment: DeliveryPaymentDto? = null
 )
+
+/** Fixed pickup location (VJoyKart Store) returned by the backend. */
+data class DeliveryStoreDto(
+    @field:Json(name="name") val name: String?,
+    @field:Json(name="latitude") val latitude: Double?,
+    @field:Json(name="longitude") val longitude: Double?,
+    @field:Json(name="mapsUrl") val mapsUrl: String?,
+    @field:Json(name="address") val address: String?
+)
+
+data class DeliveryPaymentDto(@field:Json(name="method") val method: String?, @field:Json(name="status") val status: String?)
 
 data class DeliveryOrderItemDto(
     @field:Json(name="productName") val productName: String?,

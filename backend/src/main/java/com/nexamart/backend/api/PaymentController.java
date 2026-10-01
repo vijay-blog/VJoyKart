@@ -3,6 +3,8 @@ package com.nexamart.backend.api;
 import com.nexamart.backend.api.ApiModels.PaymentCreateOrderResponse;
 import com.nexamart.backend.api.ApiModels.PaymentVerifyRequest;
 import com.nexamart.backend.api.ApiModels.OrderResponse;
+import com.nexamart.backend.service.CustomerService;
+import com.nexamart.backend.service.DispatchCoordinator;
 import com.nexamart.backend.service.PaymentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -13,9 +15,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/payments")
 public class PaymentController {
     private final PaymentService service;
+    private final DispatchCoordinator dispatch;
+    private final CustomerService customers;
 
-    public PaymentController(PaymentService service) {
+    public PaymentController(PaymentService service, DispatchCoordinator dispatch, CustomerService customers) {
         this.service = service;
+        this.dispatch = dispatch;
+        this.customers = customers;
     }
 
     @PostMapping("/create-order")
@@ -25,7 +31,11 @@ public class PaymentController {
 
     @PostMapping("/verify")
     public OrderResponse verify(@Valid @RequestBody PaymentVerifyRequest request) {
-        return service.verify(request);
+        OrderResponse paid = service.verify(request);
+        // Online orders become dispatchable once PAID; assign a delivery partner right away (scheduler retries otherwise).
+        Long id = Long.valueOf(paid.orderId());
+        dispatch.dispatchSafely(id);
+        return customers.detail(id);
     }
 
     @PostMapping("/webhook")

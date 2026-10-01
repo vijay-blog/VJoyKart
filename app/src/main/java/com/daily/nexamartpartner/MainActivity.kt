@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var authCoordinatorViewModel: AuthCoordinatorViewModel
     private var isGuardRedirecting = false
+    private var pendingDeliveryOrderId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         observeAuthState()
         observeConnectivity()
+        pendingDeliveryOrderId = intent?.getStringExtra(EXTRA_DELIVERY_ORDER_ID)
         authCoordinatorViewModel.initialize()
     }
 
@@ -85,9 +87,33 @@ class MainActivity : AppCompatActivity() {
                             }
                         )
                     }
+                    openPendingDeliveryOrder(navController)
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent.getStringExtra(EXTRA_DELIVERY_ORDER_ID)?.let { orderId ->
+            pendingDeliveryOrderId = orderId
+            val navHostFragment = supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+            openPendingDeliveryOrder(navHostFragment.navController)
+        }
+    }
+
+    /** Opens the order from a 'New delivery assigned' notification once the partner is authorised. */
+    private fun openPendingDeliveryOrder(navController: NavController) {
+        val orderId = pendingDeliveryOrderId ?: return
+        val target = R.id.deliveryOrderDetailsFragment
+        val allowed = NavigationGuard.resolveAuthorizedDestination(
+            authState = authCoordinatorViewModel.authState.value,
+            requestedDestinationId = target
+        )
+        if (allowed != target) return
+        pendingDeliveryOrderId = null
+        navController.navigate(target, android.os.Bundle().apply { putString("orderId", orderId) })
     }
 
     private fun installNavigationGuard(navController: NavController) {
@@ -120,5 +146,9 @@ class MainActivity : AppCompatActivity() {
     private fun isAtOrWithinDestination(navController: NavController, destinationId: Int): Boolean {
         val current = navController.currentDestination ?: return false
         return current.id == destinationId || current.hierarchy.any { it.id == destinationId }
+    }
+
+    companion object {
+        const val EXTRA_DELIVERY_ORDER_ID = "com.daily.nexamartpartner.extra.DELIVERY_ORDER_ID"
     }
 }
