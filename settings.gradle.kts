@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "VjoyKart"
 include(":app")
+include(":customer")
  

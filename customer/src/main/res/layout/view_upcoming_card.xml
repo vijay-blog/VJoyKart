@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="105dp"
+    android:layout_weight="1"
+    android:background="@drawable/bg_white_card_bordered"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="11dp">
+
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_icon_tile_upcoming">
+
+        <ImageView
+            android:id="@+id/upcomingIcon"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            app:tint="@color/vk_primary" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/upcomingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/vk_text"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/upcomingSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/vk_text_hint"
+        android:textSize="9sp" />
+</LinearLayout>

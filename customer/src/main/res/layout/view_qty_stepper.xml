@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="34dp"
+    android:background="@drawable/bg_qty_stepper"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/minus"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Decrease quantity"
+        android:src="@drawable/ic_remove"
+        app:tint="@color/vk_text"
+        android:scaleType="centerInside"
+        android:padding="7dp" />
+
+    <TextView
+        android:id="@+id/quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="14dp"
+        android:gravity="center"
+        android:textColor="@color/vk_text"
+        android:textStyle="bold"
+        tools:text="1" />
+
+    <ImageButton
+        android:id="@+id/plus"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Increase quantity"
+        android:src="@drawable/ic_add"
+        app:tint="@color/vk_text"
+        android:scaleType="centerInside"
+        android:padding="7dp" />
+</LinearLayout>
