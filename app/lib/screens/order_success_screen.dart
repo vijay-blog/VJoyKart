@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/order.dart';
+import '../routes/app_routes.dart';
 import 'order_detail_screen.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
@@ -54,10 +55,17 @@ class OrderSuccessScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: FilledButton(
-                  onPressed: () => Navigator.popUntil(
-                    context,
-                    (route) => route.isFirst,
-                  ),
+                  onPressed: () {
+                    // Do not rely on the current navigator stack. The order-success
+                    // screen can be opened through checkout, Razorpay callbacks,
+                    // or another nested route. Always return to a clean Home screen
+                    // so Continue Shopping is reliable and cannot get trapped in
+                    // the checkout/order-success stack.
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.home,
+                      (route) => false,
+                    );
+                  },
                   child: const Text('CONTINUE SHOPPING'),
                 ),
               ),
