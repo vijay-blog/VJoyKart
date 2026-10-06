@@ -15,6 +15,11 @@
         android:label="Main" />
 
     <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.nexamart.customer.presentation.main.WelcomeFragment"
+        android:label="Welcome" />
+
+    <fragment
         android:id="@+id/searchFragment"
         android:name="com.nexamart.customer.presentation.catalog.SearchFragment"
         android:label="Search" />

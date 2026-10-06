@@ -4,6 +4,7 @@ import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -15,6 +16,9 @@ import retrofit2.http.Query
  * stay untyped JSON because the backend mixes numbers and numeric strings.
  */
 interface CustomerApi {
+    @DELETE("account")
+    suspend fun deleteAccount(): Response<ResponseBody>
+
     @POST("auth/customer/send-otp")
     suspend fun sendOtp(@Body body: RequestBody): Response<ResponseBody>
 

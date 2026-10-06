@@ -35,6 +35,11 @@ class CustomerPrefs(context: Context) {
 
     fun remove(vararg keys: String) = prefs.edit { keys.forEach { remove(it) } }
 
+    fun clearCustomerData() = remove(
+        CART, ADDRESSES, SELECTED_ADDRESS_ID, ORDERS, CUSTOMER_ID,
+        ACCESS_TOKEN, REFRESH_TOKEN, GUEST_ACCESS_TOKEN, GUEST_REFRESH_TOKEN, CUSTOMER_PHONE,
+    )
+
     fun contains(key: String): Boolean = prefs.contains(key)
 
     companion object {

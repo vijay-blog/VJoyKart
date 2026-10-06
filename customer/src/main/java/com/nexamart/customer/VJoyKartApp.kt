@@ -6,6 +6,7 @@ import com.nexamart.customer.data.local.CustomerPrefs
 import com.nexamart.customer.data.local.FlutterPrefsMigrator
 import com.nexamart.customer.data.network.ApiClient
 import com.nexamart.customer.repository.AddressRepository
+import com.nexamart.customer.repository.AccountRepository
 import com.nexamart.customer.repository.CartRepository
 import com.nexamart.customer.repository.CatalogRepository
 import com.nexamart.customer.repository.OrderRepository
@@ -27,11 +28,20 @@ class AppContainer(context: Context) {
     val cart = CartRepository(prefs)
     val addresses = AddressRepository(prefs)
     val orders = OrderRepository(prefs, apiClient, session)
+    val account = AccountRepository(apiClient)
     val paymentResults = PaymentResultBus()
 
     /** Logs out of the CUSTOMER session and clears per-account data from the device. */
     fun logout() {
         session.logout()
+        orders.clear()
+    }
+
+    /** Removes every account-scoped cache only after the server confirms deletion. */
+    fun clearDeletedAccount() {
+        session.logout()
+        cart.clear()
+        addresses.clear()
         orders.clear()
     }
 }

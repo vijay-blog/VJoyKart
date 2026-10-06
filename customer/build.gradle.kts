@@ -41,11 +41,12 @@ android {
         minSdk = 24
         targetSdk = 36
         // Play requires a versionCode higher than the published customer release.
-        versionCode = 6
-        versionName = "2.2.0"
+        versionCode = 8
+        versionName = "2.2.2"
 
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         buildConfigField("String", "CATALOG_IMAGE_BASE_URL", "\"$catalogImageBaseUrl\"")
+        buildConfigField("String", "ACCOUNT_DELETION_URL", "\"${project.findProperty("vjoykartAccountDeletionUrl") ?: "$apiBaseUrl".removeSuffix("/api/v1") + "/delete-account"}\"")
     }
 
     signingConfigs {

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface OtpChallengeRepository extends JpaRepository<OtpChallenge, Long> {
     Optional<OtpChallenge> findTopByPhoneOrderByCreatedAtDesc(String phone);
+    void deleteByPhone(String phone);
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/vk_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="28dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VJoyKart"
+        android:textColor="@color/vk_primary"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:text="Your account has been deleted successfully."
+        android:textColor="@color/vk_text"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="You can still browse VJoyKart. Verify your mobile number at checkout if you would like to shop again."
+        android:textColor="@color/vk_text_secondary"
+        android:textSize="15sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/continueShopping"
+        style="@style/Widget.VJoyKart.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Continue Shopping" />
+</LinearLayout>

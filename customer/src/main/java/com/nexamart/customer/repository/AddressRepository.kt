@@ -63,4 +63,9 @@ class AddressRepository(
         val selected = _state.value.selected.takeUnless { it?.id == address.id } ?: list.firstOrNull()
         publish(AddressState(list, selected))
     }
+
+    fun clear() {
+        _state.value = AddressState()
+        prefs.remove(CustomerPrefs.ADDRESSES, CustomerPrefs.SELECTED_ADDRESS_ID)
+    }
 }

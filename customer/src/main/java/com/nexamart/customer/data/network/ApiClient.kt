@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit
 
 /** Builds the HTTP stack and executes calls with the error mapping of the Flutter ApiService. */
 class ApiClient(private val prefs: CustomerPrefs) {
-
     private val baseClient: OkHttpClient = OkHttpClient.Builder()
         .apply {
             if (BuildConfig.ENABLE_NETWORK_LOGGING) {

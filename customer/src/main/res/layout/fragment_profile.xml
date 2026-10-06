@@ -201,7 +201,7 @@
             <TextView
                 style="@style/VK.ProfileSection"
                 android:layout_marginTop="14dp"
-                android:text="ACCOUNT" />
+                android:text="ACCOUNT &amp; SETTINGS" />
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.VJoyKart.Card"
@@ -219,6 +219,10 @@
 
                     <include
                         android:id="@+id/logoutTile"
+                        layout="@layout/item_profile_tile" />
+
+                    <include
+                        android:id="@+id/deleteAccountTile"
                         layout="@layout/item_profile_tile" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nexamart.customer.BuildConfig
 import com.nexamart.customer.R
 import com.nexamart.customer.appContainer
 import com.nexamart.customer.databinding.FragmentProfileBinding
 import com.nexamart.customer.databinding.ItemProfileTileBinding
+import com.nexamart.customer.presentation.common.appViewModels
 import com.nexamart.customer.presentation.common.Nav.openSavedAddresses
 import com.nexamart.customer.presentation.common.Nav.openWallet
 import com.nexamart.customer.presentation.common.dial
@@ -23,6 +27,10 @@ import com.nexamart.customer.presentation.common.visibleIf
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: ProfileViewModel by appViewModels { container, _ ->
+        ProfileViewModel(container.account::deleteAccount)
+    }
+    private var deletionDialog: AlertDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
@@ -42,6 +50,14 @@ class ProfileFragment : Fragment() {
         binding.versionTile.trailingText.visibleIf(true)
         binding.versionTile.trailingText.text = BuildConfig.VERSION_NAME
         tile(binding.logoutTile, R.drawable.ic_logout, "Logout", "Sign out of this device") { confirmLogout() }
+        tile(
+            binding.deleteAccountTile,
+            R.drawable.ic_logout,
+            "Delete Account",
+            "Permanently delete your VJoyKart account and associated personal information.",
+        ) { confirmAccountDeletion() }
+        binding.deleteAccountTile.icon.setColorFilter(requireContext().getColor(R.color.vk_red))
+        binding.deleteAccountTile.title.setTextColor(requireContext().getColor(R.color.vk_red))
 
         binding.callUs.setOnClickListener { requireContext().dial(SUPPORT_NUMBER) }
         binding.whatsapp.setOnClickListener {
@@ -56,6 +72,9 @@ class ProfileFragment : Fragment() {
                 tile(binding.phoneTile, R.drawable.ic_phone_android_round, "Mobile number",
                     if (phone.isEmpty()) "Verified" else "+91 $phone", null)
             }
+        }
+        launchOnStarted {
+            viewModel.deletion.collect(::renderDeletion)
         }
     }
 
@@ -84,6 +103,58 @@ class ProfileFragment : Fragment() {
                 showMessage("You have been logged out.")
             }
             .show()
+    }
+
+    private fun confirmAccountDeletion() {
+        viewModel.clearError()
+        deletionDialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Delete your VJoyKart account?")
+            .setMessage(
+                "This action will permanently delete your account and associated personal information. " +
+                    "Some order or transaction records may be retained where required by law.",
+            )
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Delete My Account", null)
+            .create()
+            .also { dialog ->
+                dialog.setOnShowListener {
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        viewModel.deleteAccount()
+                    }
+                }
+                dialog.show()
+            }
+    }
+
+    private fun renderDeletion(state: AccountDeletionState) {
+        if (state == AccountDeletionState.Deleted) {
+            deletionDialog?.dismiss()
+            deletionDialog = null
+            requireContext().appContainer.clearDeletedAccount()
+            findNavController().navigate(
+                R.id.welcomeFragment,
+                null,
+                NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build(),
+            )
+            return
+        }
+        val dialog = deletionDialog ?: return
+        when (state) {
+            AccountDeletionState.Idle -> Unit
+            AccountDeletionState.Deleting -> {
+                dialog.setTitle("Deleting your account...")
+                dialog.setMessage("Deleting your account...")
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).isEnabled = false
+            }
+            AccountDeletionState.Deleted -> Unit
+            is AccountDeletionState.Error -> {
+                dialog.setTitle("Delete your VJoyKart account?")
+                dialog.setMessage(state.message)
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).isEnabled = true
+            }
+        }
     }
 
     private fun showAbout() {
@@ -118,6 +189,8 @@ class ProfileFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        deletionDialog?.dismiss()
+        deletionDialog = null
         super.onDestroyView()
         _binding = null
     }

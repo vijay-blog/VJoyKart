@@ -88,6 +88,7 @@ class SessionRepository(
             CustomerPrefs.REFRESH_TOKEN,
             CustomerPrefs.GUEST_ACCESS_TOKEN,
             CustomerPrefs.GUEST_REFRESH_TOKEN,
+            CustomerPrefs.CUSTOMER_PHONE,
         )
         _authenticated.value = false
     }

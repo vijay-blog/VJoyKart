@@ -17,6 +17,7 @@ object AppConfig {
 
     /** Host part of [apiBaseUrl] without the /api/v1 suffix. */
     val apiHost: String get() = apiBaseUrl.removeSuffix(API_PREFIX)
+    val accountDeletionUrl: String = BuildConfig.ACCOUNT_DELETION_URL.trim()
 
     const val TIMEOUT_SECONDS = 15L
     const val PARTNER_CATALOG_TIMEOUT_SECONDS = 8L
