@@ -15,6 +15,11 @@
         android:label="Main" />
 
     <fragment
+        android:id="@+id/loginForOrdersFragment"
+        android:name="com.nexamart.customer.presentation.auth.LoginForOrdersFragment"
+        android:label="My Orders login" />
+
+    <fragment
         android:id="@+id/welcomeFragment"
         android:name="com.nexamart.customer.presentation.main.WelcomeFragment"
         android:label="Welcome" />
@@ -48,6 +53,11 @@
         android:id="@+id/orderSuccessFragment"
         android:name="com.nexamart.customer.presentation.checkout.OrderSuccessFragment"
         android:label="Order placed" />
+
+    <fragment
+        android:id="@+id/upiQrFragment"
+        android:name="com.nexamart.customer.presentation.checkout.UpiQrFragment"
+        android:label="Scan &amp; Pay" />
 
     <fragment
         android:id="@+id/orderDetailFragment"

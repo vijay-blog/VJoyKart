@@ -93,6 +93,9 @@ class SessionRepository(
         _authenticated.value = false
     }
 
+    /** The backend rejected the token (401): drop the session so the next protected screen asks for OTP again. */
+    fun expire() = logout()
+
     private fun saveSession(response: JsonMap): Int {
         val user = response["user"].asJsonMap()
         val id = (user?.get("id") as? Number)?.toInt() ?: 0

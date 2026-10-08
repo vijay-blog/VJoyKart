@@ -16,6 +16,7 @@ import com.nexamart.customer.presentation.auth.OtpLoginViewModel
 import com.nexamart.customer.presentation.auth.bindOtpLogin
 import com.nexamart.customer.presentation.common.Nav.openOrderSuccess
 import com.nexamart.customer.presentation.common.Nav.openSavedAddresses
+import com.nexamart.customer.presentation.common.Nav
 import com.nexamart.customer.presentation.common.appViewModels
 import com.nexamart.customer.presentation.common.launchOnStarted
 import com.nexamart.customer.presentation.common.loadCatalogImage
@@ -51,10 +52,18 @@ class CheckoutFragment : Fragment() {
         binding.totalRow.value.setTypeface(null, android.graphics.Typeface.BOLD)
         binding.codTile.root.setOnClickListener { viewModel.selectPayment(CheckoutViewModel.COD) }
         binding.onlineTile.root.setOnClickListener { viewModel.selectPayment(CheckoutViewModel.ONLINE) }
+        binding.upiAppsTile.root.setOnClickListener { viewModel.selectPayment(CheckoutViewModel.ONLINE) }
+        binding.upiQrTile.root.setOnClickListener { viewModel.selectPayment(CheckoutViewModel.UPI_QR) }
         binding.codTile.icon.setImageResource(R.drawable.ic_payments_outline)
         binding.codTile.title.setText(R.string.cash_on_delivery)
         binding.codTile.subtitle.setText(R.string.cod_subtitle)
         binding.onlineTile.icon.setImageResource(R.drawable.ic_lock_outline)
+        binding.upiAppsTile.icon.setImageResource(R.drawable.ic_phone_android_round)
+        binding.upiAppsTile.title.setText(R.string.upi_apps)
+        binding.upiAppsTile.subtitle.setText(R.string.upi_apps_subtitle)
+        binding.upiQrTile.icon.setImageResource(R.drawable.ic_qr_code)
+        binding.upiQrTile.title.setText(R.string.upi_qr)
+        binding.upiQrTile.subtitle.setText(R.string.upi_qr_subtitle)
         binding.onlineTile.subtitle.setText(R.string.online_subtitle)
         binding.placeOrder.setOnClickListener { viewModel.place() }
 
@@ -97,10 +106,13 @@ class CheckoutFragment : Fragment() {
                     val subtotal = CartMath.subtotal(items)
                     val total = CartMath.total(items)
                     val online = state.paymentMethod == CheckoutViewModel.ONLINE
+                    val upiQr = state.paymentMethod == CheckoutViewModel.UPI_QR
                     binding.onlineTile.title.text = "Pay ${Formats.rupees(total)} securely"
                     bindTile(binding.codTile, !online)
                     bindTile(binding.onlineTile, online)
-                    binding.razorpayInfo.visibleIf(online)
+                    bindTile(binding.upiAppsTile, online)
+                    bindTile(binding.upiQrTile, upiQr)
+                    binding.razorpayInfo.visibleIf(online || upiQr)
 
                     binding.subtotalRow.value.text = Formats.rupees(subtotal)
                     binding.deliveryRow.value.text = Formats.rupees(CartMath.delivery(subtotal))
@@ -111,7 +123,7 @@ class CheckoutFragment : Fragment() {
                     binding.placeProgress.visibleIf(state.loading)
                     binding.placeOrder.text = when {
                         state.loading -> ""
-                        online -> "Pay Securely • ${Formats.rupees(total)}"
+                        online || upiQr -> "Pay Securely • ${Formats.rupees(total)}"
                         else -> "Place COD Order • ${Formats.rupees(total)}"
                     }
                 }
@@ -126,6 +138,13 @@ class CheckoutFragment : Fragment() {
                 when (event) {
                     is CheckoutEvent.Message -> showMessage(event.text)
                     is CheckoutEvent.OpenRazorpay -> openRazorpay(event)
+                    is CheckoutEvent.OpenUpiQr -> findNavController().navigate(
+                        R.id.upiQrFragment,
+                        android.os.Bundle().apply {
+                            putInt(Nav.ARG_ORDER_ID, event.orderId)
+                            putDouble(Nav.ARG_AMOUNT, event.amount)
+                        },
+                    )
                     is CheckoutEvent.OrderPlaced -> openOrderSuccess(event.orderId)
                 }
             }

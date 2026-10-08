@@ -16,6 +16,7 @@ object Nav {
     const val ARG_KEYWORDS = "keywords"
     const val ARG_PRODUCT_JSON = "productJson"
     const val ARG_ORDER_ID = "orderId"
+    const val ARG_AMOUNT = "amount"
     const val ARG_ADDRESS_ID = "addressId"
     const val ARG_STANDALONE = "standalone"
 

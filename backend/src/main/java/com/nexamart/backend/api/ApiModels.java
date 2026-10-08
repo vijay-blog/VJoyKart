@@ -18,6 +18,8 @@ public final class ApiModels{private ApiModels(){}
  public record CreateOrderRequest(@NotEmpty List<OrderItemRequest> items,@NotNull AddressRequest address,PaymentMethod paymentMethod){}
  public record PaymentCreateOrderResponse(Long paymentId,Long orderId,String keyId,String gateway,String gatewayOrderId,BigDecimal amount,String currency){}
  public record PaymentVerifyRequest(@NotNull Long orderId,@NotBlank String gatewayOrderId,@NotBlank String gatewayPaymentId,@NotBlank String gatewaySignature){}
+ /** Razorpay UPI QR session. status: PENDING, PAID, EXPIRED, CANCELLED or FAILED; order is only set once PAID. */
+ public record UpiQrResponse(Long paymentId,Long orderId,String qrCodeId,String imageUrl,BigDecimal amount,String currency,Long closeBy,String status,String message,OrderResponse order){}
  public record ProfileUpdate(String name,String email,@Pattern(regexp="^\\+?[0-9]{10,13}$",message="must be a valid mobile number") String phone,String vehicleType,String vehicleNumber,String licenseReference){}
  public record AvailabilityRequest(boolean available){}
  public record PageResponse<T>(List<T> content,int page,int pageSize,int totalPages,long totalElements,boolean hasNextPage,int number,int size,boolean last){public PageResponse(List<T> content,int page,int pageSize,int totalPages,long totalElements,boolean hasNextPage){this(content,page,pageSize,totalPages,totalElements,hasNextPage,page,pageSize,!hasNextPage);}}

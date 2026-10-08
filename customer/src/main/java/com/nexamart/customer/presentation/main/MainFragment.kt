@@ -17,6 +17,7 @@ import com.nexamart.customer.presentation.cart.CartFragment
 import com.nexamart.customer.presentation.common.launchOnStarted
 import com.nexamart.customer.presentation.home.HomeFragment
 import com.nexamart.customer.presentation.orders.OrdersFragment
+import com.nexamart.customer.presentation.auth.LoginForOrdersFragment
 import com.nexamart.customer.presentation.profile.ProfileFragment
 import com.nexamart.customer.repository.CartMath
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,7 +69,14 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.bottomNav.setOnItemSelectedListener { item ->
-            tabs.select(tabIds.indexOf(item.itemId))
+            val selected = tabIds.indexOf(item.itemId)
+            if (selected == MainTabsViewModel.TAB_ORDERS &&
+                !requireContext().appContainer.session.isAuthenticated()
+            ) {
+                findNavController().navigate(R.id.loginForOrdersFragment)
+            } else {
+                tabs.select(selected)
+            }
             true
         }
         binding.bottomNav.setOnItemReselectedListener { }

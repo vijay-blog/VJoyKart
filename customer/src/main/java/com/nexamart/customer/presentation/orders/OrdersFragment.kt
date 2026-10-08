@@ -21,6 +21,8 @@ import com.nexamart.customer.presentation.common.Nav.openOrderDetail
 import com.nexamart.customer.presentation.common.dpF
 import com.nexamart.customer.presentation.common.launchOnStarted
 import com.nexamart.customer.presentation.common.visibleIf
+import com.nexamart.customer.presentation.main.MainTabsViewModel
+import com.nexamart.customer.presentation.main.returnToMainTab
 import com.nexamart.customer.util.Formats
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -50,6 +52,9 @@ class OrdersFragment : Fragment() {
         binding.filterAll.setOnClickListener { filter.value = 0 }
         binding.filterActive.setOnClickListener { filter.value = 1 }
         binding.filterCompleted.setOnClickListener { filter.value = 2 }
+        binding.startShopping.setOnClickListener {
+            returnToMainTab(MainTabsViewModel.TAB_HOME)
+        }
 
         launchOnStarted {
             combine(orders.state, filter) { s, f -> s to f }.collect { (state, selected) ->
@@ -67,6 +72,7 @@ class OrdersFragment : Fragment() {
                 adapter.submitList(list)
                 binding.swipeRefresh.isRefreshing = state.refreshing
                 binding.emptyState.visibleIf(list.isEmpty())
+                binding.startShopping.visibleIf(selected == 0 && list.isEmpty())
                 binding.emptyTitle.text = when (selected) {
                     1 -> "No active orders"
                     2 -> "No completed orders"

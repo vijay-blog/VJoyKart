@@ -199,7 +199,10 @@ data class CustomerOrder(
 
     val statusLabel: String
         get() {
-            if (deliveryStatus == "CANCELLED") return "Cancelled"
+            // Terminal states always win, even when partner details are missing from the payload.
+            if (deliveryStatus == "CANCELLED" || status == OrderStatus.cancelled) return "Cancelled"
+            if (deliveryStatus == "DELIVERED" || status == OrderStatus.delivered) return "Delivered"
+            if (status == OrderStatus.returned || status == OrderStatus.deliveryFailed) return status.label
             if (deliveryStatus == "ORDER_PLACED" || !hasDeliveryPartner) {
                 return if (paymentMethod == "ONLINE" && paymentStatus != "PAID") {
                     "Awaiting payment"
@@ -337,6 +340,48 @@ data class PaymentOrder(
                 gatewayOrderId = json["gatewayOrderId"].jsonString() ?: "null",
                 amount = requiredNumber("amount").toDouble(),
                 currency = json["currency"].jsonString() ?: "INR",
+            )
+        }
+    }
+}
+
+/** Razorpay UPI QR session returned by `/payments/upi-qr*`. Only [STATUS_PAID] (server-verified) confirms payment. */
+data class UpiQrSession(
+    val orderId: Int,
+    val qrCodeId: String?,
+    val imageUrl: String?,
+    val amount: Double,
+    val currency: String,
+    /** Epoch seconds when Razorpay closes the QR. */
+    val closeBy: Long?,
+    val status: String,
+    val message: String?,
+    val order: CustomerOrder?,
+) {
+    val isPaid: Boolean get() = status == STATUS_PAID && order != null
+    val isPending: Boolean get() = status == STATUS_PENDING
+
+    companion object {
+        const val STATUS_PENDING = "PENDING"
+        const val STATUS_PAID = "PAID"
+        const val STATUS_EXPIRED = "EXPIRED"
+        const val STATUS_CANCELLED = "CANCELLED"
+        const val STATUS_FAILED = "FAILED"
+
+        fun fromJson(json: JsonMap): UpiQrSession {
+            val orderId = (json["orderId"] as? Number)?.toInt() ?: throw IllegalArgumentException("Missing orderId")
+            val amount = json["amount"].jsonDoubleOrNull() ?: throw IllegalArgumentException("Missing amount")
+            val status = json["status"].jsonString() ?: throw IllegalArgumentException("Missing status")
+            return UpiQrSession(
+                orderId = orderId,
+                qrCodeId = json["qrCodeId"].jsonString(),
+                imageUrl = json["imageUrl"].jsonString()?.takeIf { it.startsWith("https://") },
+                amount = amount,
+                currency = json["currency"].jsonString() ?: "INR",
+                closeBy = (json["closeBy"] as? Number)?.toLong()?.takeIf { it > 0 },
+                status = status,
+                message = json["message"].jsonString(),
+                order = json["order"].asJsonMap()?.let { CustomerOrder.fromJson(it) },
             )
         }
     }

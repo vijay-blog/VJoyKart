@@ -41,7 +41,7 @@ android {
         minSdk = 24
         targetSdk = 36
         // Play requires a versionCode higher than the published customer release.
-        versionCode = 8
+        versionCode = 9
         versionName = "2.2.2"
 
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")

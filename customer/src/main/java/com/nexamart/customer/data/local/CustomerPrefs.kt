@@ -36,7 +36,7 @@ class CustomerPrefs(context: Context) {
     fun remove(vararg keys: String) = prefs.edit { keys.forEach { remove(it) } }
 
     fun clearCustomerData() = remove(
-        CART, ADDRESSES, SELECTED_ADDRESS_ID, ORDERS, CUSTOMER_ID,
+        CART, ADDRESSES, SELECTED_ADDRESS_ID, ORDERS, ORDERS_OWNER, CUSTOMER_ID,
         ACCESS_TOKEN, REFRESH_TOKEN, GUEST_ACCESS_TOKEN, GUEST_REFRESH_TOKEN, CUSTOMER_PHONE,
     )
 
@@ -49,6 +49,8 @@ class CustomerPrefs(context: Context) {
         const val ADDRESSES = "zp.addresses"
         const val SELECTED_ADDRESS_ID = "zp.selectedAddressId"
         const val ORDERS = "zp.orders"
+        /** Customer id that owns the cached [ORDERS], so one account never sees another account's cache. */
+        const val ORDERS_OWNER = "vk.ordersOwner"
         const val CUSTOMER_ID = "nm.customerId"
         const val ACCESS_TOKEN = "vk.accessToken"
         const val REFRESH_TOKEN = "vk.refreshToken"
@@ -61,6 +63,6 @@ class CustomerPrefs(context: Context) {
             SELECTED_ADDRESS_ID, ACCESS_TOKEN, REFRESH_TOKEN,
             GUEST_ACCESS_TOKEN, GUEST_REFRESH_TOKEN, CUSTOMER_PHONE,
         )
-        val INT_KEYS = setOf(CUSTOMER_ID)
+        val INT_KEYS = setOf(CUSTOMER_ID, ORDERS_OWNER)
     }
 }

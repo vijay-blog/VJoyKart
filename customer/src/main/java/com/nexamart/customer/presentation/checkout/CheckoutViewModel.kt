@@ -27,6 +27,7 @@ data class CheckoutState(
 sealed interface CheckoutEvent {
     data class Message(val text: String) : CheckoutEvent
     data class OpenRazorpay(val keyId: String, val options: JSONObject) : CheckoutEvent
+    data class OpenUpiQr(val orderId: Int, val amount: Double) : CheckoutEvent
     data class OrderPlaced(val orderId: String) : CheckoutEvent
 }
 
@@ -97,6 +98,10 @@ class CheckoutViewModel(
                         .put("theme", JSONObject().put("color", "#3454D1"))
                     container.paymentResults.consume()
                     _events.send(CheckoutEvent.OpenRazorpay(paymentOrder.keyId, options))
+                } else if (method == UPI_QR) {
+                    pendingOnlineOrderId = order.id.toIntOrNull()
+                        ?: throw ApiException("Payment order id was invalid. Please try again.", 400)
+                    _events.send(CheckoutEvent.OpenUpiQr(pendingOnlineOrderId!!, order.total))
                 } else {
                     container.cart.clear()
                     _events.send(CheckoutEvent.OrderPlaced(order.id))
@@ -161,6 +166,7 @@ class CheckoutViewModel(
     companion object {
         const val COD = "COD"
         const val ONLINE = "ONLINE"
+        const val UPI_QR = "UPI_QR"
         private const val KEY_METHOD = "paymentMethod"
         private const val KEY_PENDING_ORDER = "pendingOnlineOrderId"
         private const val KEY_PENDING_GATEWAY = "pendingGatewayOrderId"

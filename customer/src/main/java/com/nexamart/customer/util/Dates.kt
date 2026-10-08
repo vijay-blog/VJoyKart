@@ -50,6 +50,10 @@ object Formats {
     /** Dart: '₹${value.round()}' */
     fun rupees(value: Double): String = "₹" + Math.round(value)
 
+    /** Exact payable amount with paise, e.g. "₹800.00" (used where the customer must pay an exact sum). */
+    fun rupeesExact(value: Double): String =
+        "₹" + java.math.BigDecimal.valueOf(value).setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+
     fun orderDateTime(millis: Long): String = SimpleDateFormat("dd MMM yyyy • hh:mm a", Locale.ENGLISH).format(Date(millis))
 
     fun orderDateTimeComma(millis: Long): String = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.ENGLISH).format(Date(millis))
