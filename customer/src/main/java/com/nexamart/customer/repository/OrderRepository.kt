@@ -7,7 +7,6 @@ import com.nexamart.customer.model.Address
 import com.nexamart.customer.model.CartItem
 import com.nexamart.customer.model.CustomerOrder
 import com.nexamart.customer.model.PaymentOrder
-import com.nexamart.customer.model.UpiQrSession
 import com.nexamart.customer.util.Json
 import com.nexamart.customer.util.asJsonMap
 import kotlinx.coroutines.Dispatchers
@@ -198,27 +197,6 @@ class OrderRepository(
         val order = parseOrder(response)
         upsertFirst(order)
         return order
-    }
-
-    suspend fun createUpiQr(orderId: Int): UpiQrSession = upiQrCall(orderId) { api.customerApi.createUpiQr(it) }
-
-    suspend fun upiQrStatus(orderId: Int): UpiQrSession = upiQrCall(orderId) { api.customerApi.upiQrStatus(it) }
-
-    suspend fun cancelUpiQr(orderId: Int): UpiQrSession = upiQrCall(orderId) { api.customerApi.cancelUpiQr(it) }
-
-    private suspend fun upiQrCall(
-        orderId: Int,
-        call: suspend (okhttp3.RequestBody) -> retrofit2.Response<okhttp3.ResponseBody>,
-    ): UpiQrSession {
-        val response = api.execute { call(ApiClient.jsonBody(mapOf("orderId" to orderId))) }.asJsonMap()
-            ?: throw ApiException(ApiException.FORMAT_MESSAGE, 0)
-        val session = try {
-            UpiQrSession.fromJson(response)
-        } catch (_: Exception) {
-            throw ApiException(ApiException.FORMAT_MESSAGE, 0)
-        }
-        session.order?.let { upsertFirst(it) }
-        return session
     }
 
     /** Clears the in-memory list and the device cache (used on logout). */

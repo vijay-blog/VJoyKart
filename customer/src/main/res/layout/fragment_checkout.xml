@@ -151,24 +151,6 @@
                             android:id="@+id/onlineTile"
                             layout="@layout/item_payment_option" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/vk_divider" />
-
-                        <include
-                            android:id="@+id/upiAppsTile"
-                            layout="@layout/item_payment_option" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/vk_divider" />
-
-                        <include
-                            android:id="@+id/upiQrTile"
-                            layout="@layout/item_payment_option" />
-
                         <LinearLayout
                             android:id="@+id/razorpayInfo"
                             android:layout_width="match_parent"

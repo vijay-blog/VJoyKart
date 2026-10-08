@@ -47,10 +47,6 @@
     <string name="cash_on_delivery">Cash on Delivery</string>
     <string name="cod_subtitle">Pay when your order arrives</string>
     <string name="online_subtitle">Razorpay UPI, card, wallet or netbanking</string>
-    <string name="upi_apps">UPI Apps</string>
-    <string name="upi_apps_subtitle">Google Pay, PhonePe and other apps supported by Razorpay</string>
-    <string name="upi_qr">UPI QR</string>
-    <string name="upi_qr_subtitle">Scan &amp; pay from another phone</string>
     <string name="razorpay_info">Secure checkout through Razorpay. Your card/UPI details are handled by the payment gateway.</string>
     <string name="verify_mobile_title">Verify your mobile number</string>
     <string name="verify_mobile_desc">You can shop as a guest. We only ask for your mobile number when you are ready to place the order.</string>

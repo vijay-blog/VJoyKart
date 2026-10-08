@@ -52,17 +52,6 @@ interface CustomerApi {
 
     @POST("payments/verify")
     suspend fun verifyPayment(@Body body: RequestBody): Response<ResponseBody>
-
-    /** Razorpay UPI QR (QR Codes API) for the order's server-side total. */
-    @POST("payments/upi-qr")
-    suspend fun createUpiQr(@Body body: RequestBody): Response<ResponseBody>
-
-    /** Server-side check with Razorpay; the order is only PAID after this confirms a captured payment. */
-    @POST("payments/upi-qr/status")
-    suspend fun upiQrStatus(@Body body: RequestBody): Response<ResponseBody>
-
-    @POST("payments/upi-qr/cancel")
-    suspend fun cancelUpiQr(@Body body: RequestBody): Response<ResponseBody>
 }
 
 /** Public, unauthenticated Partner catalog used only to enrich product images. */

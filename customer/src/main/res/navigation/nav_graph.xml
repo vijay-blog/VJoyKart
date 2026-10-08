@@ -55,11 +55,6 @@
         android:label="Order placed" />
 
     <fragment
-        android:id="@+id/upiQrFragment"
-        android:name="com.nexamart.customer.presentation.checkout.UpiQrFragment"
-        android:label="Scan &amp; Pay" />
-
-    <fragment
         android:id="@+id/orderDetailFragment"
         android:name="com.nexamart.customer.presentation.orders.OrderDetailFragment"
         android:label="Order" />
