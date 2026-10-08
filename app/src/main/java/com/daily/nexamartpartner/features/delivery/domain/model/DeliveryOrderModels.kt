@@ -30,7 +30,9 @@ data class DeliveryOrderSummary(
     val status: String,
     val paymentStatus: String?,
     val assignedAt: String?,
-    val createdAt: String?
+    val createdAt: String?,
+    val statusLabel: String? = null,
+    val pickupName: String = DEFAULT_PICKUP_NAME
 )
 
 data class DeliveryOrderDetails(
@@ -49,7 +51,12 @@ data class DeliveryOrderDetails(
     val allowedActions: List<DeliveryOrderAction>,
     val proofOfDeliveryRequired: Boolean = false,
     val proofOfDeliveryStatus: String? = null,
-    val proofOfDeliveryUrl: String? = null
+    val proofOfDeliveryUrl: String? = null,
+    val statusLabel: String? = null,
+    val pickupName: String = DEFAULT_PICKUP_NAME,
+    val pickupAddress: String? = null,
+    val pickupMapsUrl: String? = null,
+    val paymentMethod: String? = null
 )
 
 data class DeliveryOrderItem(
@@ -61,15 +68,33 @@ data class DeliveryOrderItem(
 
 data class DeliveryOrderTimeline(val status: String, val timestamp: String?)
 
+const val DEFAULT_PICKUP_NAME = "VJoyKart Store"
+
+/**
+ * Delivery progress actions. The backend returns only the single valid next step in
+ * `allowedActions`, so exactly one of these buttons is enabled at a time:
+ * DELIVERY_ASSIGNED -> PACKING -> ON_THE_WAY -> ARRIVED -> DELIVERED.
+ */
 enum class DeliveryOrderAction(val backendValue: String, val label: String) {
-    ACCEPT("ACCEPT", "Accept Order"),
-    REJECT("REJECT", "Reject Order"),
-    PICKUP("PICKUP", "Mark Picked Up"),
-    OUT_FOR_DELIVERY("OUT_FOR_DELIVERY", "Start Delivery"),
-    COMPLETE("COMPLETE", "Mark Delivered"),
-    CANCEL("CANCEL", "Cancel Delivery");
+    PACKING("PACKING", "Start Packing"),
+    ON_THE_WAY("ON_THE_WAY", "On the Way"),
+    ARRIVED("ARRIVED", "Arrived"),
+    DELIVERED("DELIVERED", "Delivered");
 
     companion object {
         fun fromBackend(value: String): DeliveryOrderAction? = entries.firstOrNull { it.backendValue.equals(value.trim(), true) }
     }
+}
+
+/** Human-readable delivery status shown in the partner app. */
+fun deliveryStatusLabel(status: String?): String = when (status?.uppercase()) {
+    "ORDER_PLACED" -> "Order placed"
+    "DELIVERY_ASSIGNED" -> "Delivery boy assigned"
+    "PACKING" -> "Packing"
+    "ON_THE_WAY" -> "On the way"
+    "ARRIVED" -> "Arrived"
+    "DELIVERED" -> "Delivered"
+    "CANCELLED" -> "Cancelled"
+    null, "" -> "Status unavailable"
+    else -> status.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
 }

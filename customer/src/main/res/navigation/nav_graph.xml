@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.nexamart.customer.presentation.main.SplashFragment"
+        android:label="Splash" />
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.nexamart.customer.presentation.main.MainFragment"
+        android:label="Main" />
+
+    <fragment
+        android:id="@+id/loginForOrdersFragment"
+        android:name="com.nexamart.customer.presentation.auth.LoginForOrdersFragment"
+        android:label="My Orders login" />
+
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.nexamart.customer.presentation.main.WelcomeFragment"
+        android:label="Welcome" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.nexamart.customer.presentation.catalog.SearchFragment"
+        android:label="Search" />
+
+    <fragment
+        android:id="@+id/categoryProductsFragment"
+        android:name="com.nexamart.customer.presentation.catalog.CategoryProductsFragment"
+        android:label="Category" />
+
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.nexamart.customer.presentation.product.ProductDetailFragment"
+        android:label="Product" />
+
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.nexamart.customer.presentation.cart.CartFragment"
+        android:label="Cart" />
+
+    <fragment
+        android:id="@+id/checkoutFragment"
+        android:name="com.nexamart.customer.presentation.checkout.CheckoutFragment"
+        android:label="Checkout" />
+
+    <fragment
+        android:id="@+id/orderSuccessFragment"
+        android:name="com.nexamart.customer.presentation.checkout.OrderSuccessFragment"
+        android:label="Order placed" />
+
+    <fragment
+        android:id="@+id/orderDetailFragment"
+        android:name="com.nexamart.customer.presentation.orders.OrderDetailFragment"
+        android:label="Order" />
+
+    <fragment
+        android:id="@+id/walletFragment"
+        android:name="com.nexamart.customer.presentation.profile.WalletFragment"
+        android:label="Wallet" />
+
+    <fragment
+        android:id="@+id/savedAddressesFragment"
+        android:name="com.nexamart.customer.presentation.address.SavedAddressesFragment"
+        android:label="Saved addresses" />
+
+    <fragment
+        android:id="@+id/addressFormFragment"
+        android:name="com.nexamart.customer.presentation.address.AddressFormFragment"
+        android:label="Address" />
+</navigation>

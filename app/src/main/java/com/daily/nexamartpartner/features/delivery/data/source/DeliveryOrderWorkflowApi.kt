@@ -7,5 +7,5 @@ import retrofit2.http.*
 interface DeliveryOrderWorkflowApi {
     @GET suspend fun getAssignedOrders(@Url path:String,@QueryMap query:Map<String,String>):Response<DeliveryOrdersPageDto>
     @GET suspend fun getOrderDetails(@Url path:String):Response<DeliveryOrderDetailsDto>
-    @PATCH suspend fun performAction(@Url path:String,@Body body:Map<String,String>):Response<Unit>
+    @POST suspend fun performAction(@Url path:String,@Body body:Map<String,String>):Response<Unit>
 }

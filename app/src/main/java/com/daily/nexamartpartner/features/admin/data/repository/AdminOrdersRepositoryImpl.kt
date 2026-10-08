@@ -157,7 +157,9 @@ class AdminOrdersRepositoryImpl(
                 status = it.status?.trim(),
                 partnerName = it.partnerName?.trim(),
                 assignedAt = it.assignedAt?.trim(),
-                partnerId = it.partnerId?.trim()
+                partnerId = it.partnerId?.trim(),
+                partnerPhone = it.partnerPhone?.trim()?.takeIf { p -> p.isNotEmpty() },
+                assignmentStatus = it.assignmentStatus?.trim()
             )
         }
 

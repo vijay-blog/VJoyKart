@@ -25,6 +25,7 @@ import com.daily.nexamartpartner.features.auth.presentation.viewmodel.AuthCoordi
 import com.daily.nexamartpartner.features.auth.presentation.viewmodel.AuthCoordinatorViewModelFactory
 import com.daily.nexamartpartner.features.delivery.domain.model.DeliveryOrderAction
 import com.daily.nexamartpartner.features.delivery.domain.model.DeliveryOrderDetails
+import com.daily.nexamartpartner.features.delivery.domain.model.deliveryStatusLabel
 import com.daily.nexamartpartner.features.delivery.presentation.location.DeliveryNavigationHelper
 import com.daily.nexamartpartner.features.delivery.presentation.viewmodel.DeliveryOrderDetailsViewModel
 import com.daily.nexamartpartner.features.delivery.presentation.viewmodel.DeliveryOrderDetailsViewModelFactory
@@ -92,7 +93,8 @@ class DeliveryOrderDetailsScreen : Fragment(R.layout.fragment_delivery_order_det
 
     private fun renderOrder(order: DeliveryOrderDetails, busy: Boolean) {
         b.orderId.text = order.orderId
-        b.status.text = "Status: ${order.status}"
+        b.status.text = "Status: ${order.statusLabel ?: order.status}\nPickup: ${order.pickupName}" + (order.pickupAddress?.takeIf { it.isNotBlank() }?.let { " • $it" } ?: "")
+        b.status.setOnClickListener { order.pickupMapsUrl?.takeIf { it.isNotBlank() }?.let(::openUrl) }
         b.customer.text = order.customerName
         b.phone.text = order.customerPhone?.takeIf { it.isNotBlank() }?.let { "📞 $it" } ?: "Phone unavailable"
         b.phone.isEnabled = !order.customerPhone.isNullOrBlank()
@@ -108,7 +110,7 @@ class DeliveryOrderDetailsScreen : Fragment(R.layout.fragment_delivery_order_det
         b.copyAddressButton.setOnClickListener { order.address?.let(::copyAddress) }
         renderProof(order)
         b.amount.text = "Total: ${order.totalAmount?.let { if (order.currencyCode.isNullOrBlank()) it.toPlainString() else "${order.currencyCode} ${it.toPlainString()}" } ?: "Unavailable"}"
-        b.payment.text = "Payment: ${order.paymentStatus ?: "Unavailable"}"
+        b.payment.text = "Payment: ${order.paymentMethod?.let { if (it == "COD") "Cash on Delivery • " else "Online • " } ?: ""}${order.paymentStatus ?: "Unavailable"}"
 
         b.items.removeAllViews()
         if (order.items.isEmpty()) addLine(b.items, "No item details available")
@@ -119,15 +121,21 @@ class DeliveryOrderDetailsScreen : Fragment(R.layout.fragment_delivery_order_det
 
         b.timeline.removeAllViews()
         if (order.timeline.isEmpty()) addLine(b.timeline, "No timeline events available")
-        else order.timeline.forEach { event -> addLine(b.timeline, "${event.status}  ${event.timestamp ?: "Time unavailable"}") }
+        else order.timeline.forEach { event -> addLine(b.timeline, "${deliveryStatusLabel(event.status)}  ${event.timestamp ?: "Time unavailable"}") }
 
+        // All four steps are always shown; only the backend-provided next step is enabled.
         b.actions.removeAllViews()
-        if (order.allowedActions.isEmpty()) addLine(b.actions, "No actions available for this order")
-        else order.allowedActions.forEach { action ->
+        when (order.status.uppercase()) {
+            "DELIVERED" -> addLine(b.actions, "Delivered — no further action needed.")
+            "CANCELLED" -> addLine(b.actions, "This order was cancelled.")
+        }
+        DeliveryOrderAction.entries.forEach { action ->
+            val allowed = action in order.allowedActions
             val button = MaterialButton(requireContext()).apply {
                 text = action.label
-                isEnabled = !busy
-                setOnClickListener { if (action == DeliveryOrderAction.COMPLETE) confirmCompletion(action, order) else confirm(action) }
+                isEnabled = allowed && !busy
+                alpha = if (allowed) 1f else 0.45f
+                setOnClickListener { if (action == DeliveryOrderAction.DELIVERED) confirmCompletion(action, order) else confirm(action) }
             }
             b.actions.addView(button)
         }
@@ -180,6 +188,11 @@ class DeliveryOrderDetailsScreen : Fragment(R.layout.fragment_delivery_order_det
             .show()
     }
 
+    private fun openUrl(url: String) {
+        runCatching { startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
+            .onFailure { Toast.makeText(requireContext(), "No maps app available", Toast.LENGTH_SHORT).show() }
+    }
+
     private fun dial(phone: String) {
         startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${phone.trim()}")))
     }
@@ -203,7 +216,7 @@ class DeliveryOrderDetailsScreen : Fragment(R.layout.fragment_delivery_order_det
     }
 
     private fun shareOrder() {
-        val text = "NexaMart delivery order ${id}. Please use the order ID to view delivery details."
+        val text = "VJoyKart delivery order ${id}. Please use the order ID to view delivery details."
         startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)

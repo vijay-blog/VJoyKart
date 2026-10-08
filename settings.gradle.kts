@@ -22,6 +22,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "NexamartPartner"
+rootProject.name = "VjoyKart"
 include(":app")
+include(":customer")
  

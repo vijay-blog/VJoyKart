@@ -5,6 +5,7 @@ import com.daily.nexamartpartner.core.result.AppResult
 import com.daily.nexamartpartner.core.result.FailureType
 import com.daily.nexamartpartner.features.admin.data.model.AdminDashboardResponseDto
 import com.daily.nexamartpartner.features.admin.domain.model.AdminDashboard
+import com.daily.nexamartpartner.features.admin.domain.model.AdminNotification
 import com.daily.nexamartpartner.features.admin.domain.model.DashboardKpis
 import com.daily.nexamartpartner.features.admin.domain.model.RecentOrderSummary
 import com.daily.nexamartpartner.features.admin.domain.repository.AdminDashboardRepository
@@ -71,7 +72,19 @@ class AdminDashboardRepositoryImpl(
             AdminDashboard(
                 kpis = kpis,
                 recentOrders = mappedRecentOrders,
-                recentOrdersAvailable = dto.recentOrders != null
+                recentOrdersAvailable = dto.recentOrders != null,
+                unreadNotifications = dto.unreadNotifications ?: 0L,
+                notifications = dto.notifications.orEmpty().mapNotNull { n ->
+                    val id = n.id?.trim().takeUnless { it.isNullOrEmpty() } ?: return@mapNotNull null
+                    AdminNotification(
+                        id = id,
+                        title = n.title?.trim().orEmpty(),
+                        message = n.message?.trim().orEmpty(),
+                        createdAt = n.createdAt?.trim(),
+                        read = n.read == true,
+                        orderId = n.orderId
+                    )
+                }
             )
         )
     }

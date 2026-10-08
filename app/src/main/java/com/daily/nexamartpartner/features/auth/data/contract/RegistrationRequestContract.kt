@@ -6,6 +6,7 @@ class RegistrationRequestContract {
     fun buildBody(credentials: RegistrationCredentials): Map<String, String> = mapOf(
         "name" to credentials.name.trim(),
         "email" to credentials.email.trim().lowercase(),
+        "phone" to credentials.phone.filter { it.isDigit() || it == '+' },
         "password" to credentials.password
     )
 }

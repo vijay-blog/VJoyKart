@@ -6,6 +6,7 @@ import com.daily.nexamartpartner.features.admin.domain.model.PagedProducts
 import com.daily.nexamartpartner.features.admin.domain.model.ProductAdminAction
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDetails
 import com.daily.nexamartpartner.features.admin.domain.model.ProductDraft
+import com.daily.nexamartpartner.features.admin.domain.model.ProductImageUpload
 import com.daily.nexamartpartner.features.admin.domain.model.ProductsQuery
 import com.daily.nexamartpartner.features.admin.domain.repository.ProductManagementRepository
 
@@ -32,6 +33,13 @@ class CreateProductUseCase(private val repository: ProductManagementRepository) 
 class UpdateProductUseCase(private val repository: ProductManagementRepository) {
     suspend operator fun invoke(productId: String, draft: ProductDraft): AppResult<ProductDetails> =
         repository.updateProduct(productId, draft)
+}
+
+
+
+class UploadProductImageUseCase(private val repository: ProductManagementRepository) {
+    suspend operator fun invoke(productId: String, image: ProductImageUpload): AppResult<ProductDetails> =
+        repository.uploadProductImage(productId, image)
 }
 
 class PerformProductAdminActionUseCase(private val repository: ProductManagementRepository) {

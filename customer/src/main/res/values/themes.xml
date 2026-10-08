@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.VJoyKart" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/vk_primary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/vk_primary_soft</item>
+        <item name="colorOnPrimaryContainer">@color/vk_dark</item>
+        <item name="colorSecondary">@color/vk_primary</item>
+        <item name="colorSecondaryContainer">@color/vk_primary_soft</item>
+        <item name="colorOnSecondaryContainer">@color/vk_dark</item>
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurfaceContainer">@android:color/white</item>
+        <item name="colorSurfaceContainerLow">@android:color/white</item>
+        <item name="colorOnSurface">@color/vk_text</item>
+        <item name="colorOnSurfaceVariant">@color/vk_grey_700</item>
+        <item name="colorOutline">@color/vk_grey</item>
+        <item name="colorError">#B3261E</item>
+        <item name="android:colorBackground">@color/vk_bg</item>
+        <item name="android:windowBackground">@color/vk_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="materialCardViewStyle">@style/Widget.VJoyKart.Card</item>
+        <item name="textInputStyle">@style/Widget.VJoyKart.TextInput</item>
+        <item name="materialButtonStyle">@style/Widget.VJoyKart.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.VJoyKart.Button.Outlined</item>
+        <item name="borderlessButtonStyle">@style/Widget.VJoyKart.Button.Text</item>
+        <item name="toolbarStyle">@style/Widget.VJoyKart.Toolbar</item>
+        <item name="snackbarStyle">@style/Widget.Material3.Snackbar</item>
+        <item name="bottomNavigationStyle">@style/Widget.VJoyKart.BottomNav</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Theme.VJoyKart.Launch">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Widget.VJoyKart.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@android:color/white</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardCornerRadius">18dp</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <style name="Widget.VJoyKart.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@android:color/white</item>
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">1.2dp</item>
+        <item name="boxCornerRadiusTopStart">14dp</item>
+        <item name="boxCornerRadiusTopEnd">14dp</item>
+        <item name="boxCornerRadiusBottomStart">14dp</item>
+        <item name="boxCornerRadiusBottomEnd">14dp</item>
+    </style>
+
+    <style name="Widget.VJoyKart.Button" parent="Widget.Material3.Button">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="cornerRadius">26dp</item>
+    </style>
+
+    <style name="Widget.VJoyKart.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="cornerRadius">26dp</item>
+    </style>
+
+    <style name="Widget.VJoyKart.Button.Small" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">34dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">10dp</item>
+    </style>
+
+    <style name="Widget.VJoyKart.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.VJoyKart.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/vk_bg</item>
+        <item name="titleTextAppearance">@style/TextAppearance.VJoyKart.ToolbarTitle</item>
+        <item name="navigationIconTint">@color/vk_text</item>
+    </style>
+
+    <style name="Widget.VJoyKart.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="backgroundTint">@android:color/white</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.VJoyKart.BottomNav.Indicator</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <style name="Widget.VJoyKart.BottomNav.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/vk_primary_soft</item>
+    </style>
+
+    <style name="TextAppearance.VJoyKart.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/vk_text</item>
+    </style>
+
+    <!-- Typography helpers matching the Flutter font weights (w800/w900 → bold). -->
+    <style name="VK.Text" parent="">
+        <item name="android:textColor">@color/vk_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="VK.Text.Secondary">
+        <item name="android:textColor">@color/vk_text_secondary</item>
+    </style>
+
+    <style name="VK.Text.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/vk_text_secondary</item>
+    </style>
+
+    <style name="VK.Text.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="VK.Text.Section">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="VK.Text.Title">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="VK.Text.Price">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="VK.Text.Mrp">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/vk_grey_500</item>
+    </style>
+
+    <style name="VK.Text.Badge">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/vk_primary</item>
+        <item name="android:background">@drawable/bg_discount_badge</item>
+        <item name="android:paddingStart">7dp</item>
+        <item name="android:paddingEnd">7dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+    </style>
+    <style name="VK.MapLabel" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_map_label</item>
+        <item name="android:elevation">3dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/vk_text</item>
+    </style>
+    <style name="VK.ProfileSection" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.09</item>
+        <item name="android:textColor">@color/vk_text_secondary</item>
+    </style>
+</resources>

@@ -177,13 +177,22 @@ class AdminOrderDetailsScreen : Fragment(R.layout.fragment_admin_order_details) 
 
         binding.orderTotalsText.text = formatTotals(details)
 
+        val unavailable = getString(R.string.admin_order_details_unavailable)
+        val delivery = details.delivery
+        val deliveryStatusLabel = listOfNotNull(
+            delivery?.status?.takeIf { it.isNotBlank() },
+            delivery?.assignmentStatus?.takeIf { it.isNotBlank() && !it.equals(delivery.status, true) }
+        ).joinToString(" • ").ifBlank { unavailable }
         binding.deliveryStatusText.text = getString(
             R.string.admin_order_details_delivery_status_template,
-            details.delivery?.status ?: getString(R.string.admin_order_details_unavailable)
+            deliveryStatusLabel
         )
+        val partnerLabel = delivery?.partnerName?.let { name ->
+            delivery.partnerPhone?.let { "$name • $it" } ?: name
+        } ?: unavailable
         binding.deliveryPartnerText.text = getString(
             R.string.admin_order_details_delivery_partner_template,
-            details.delivery?.partnerName ?: getString(R.string.admin_order_details_unavailable)
+            partnerLabel
         )
         binding.deliveryPartnerText.isClickable = details.delivery?.partnerId != null
         binding.deliveryPartnerText.setOnClickListener(

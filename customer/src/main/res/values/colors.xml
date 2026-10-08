@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AppTheme (lib/core/app_theme.dart) -->
+    <color name="vk_primary">#3454D1</color>
+    <color name="vk_dark">#182451</color>
+    <color name="vk_bg">#F6F7FC</color>
+    <color name="vk_card">#FFFFFF</color>
+    <color name="vk_primary_soft">#E9EDFF</color>
+    <color name="vk_image_bg">#F3F5FF</color>
+    <color name="vk_upcoming_icon_bg">#F0F2FF</color>
+    <color name="vk_text">#1B1B1F</color>
+    <color name="vk_text_secondary">#8A000000</color>
+    <color name="vk_text_hint">#73000000</color>
+    <color name="vk_grey">#9E9E9E</color>
+    <color name="vk_grey_500">#9E9E9E</color>
+    <color name="vk_grey_600">#757575</color>
+    <color name="vk_grey_700">#616161</color>
+    <color name="vk_divider">#1F000000</color>
+    <color name="vk_border">#0D000000</color>
+    <color name="vk_black_26">#42000000</color>
+    <color name="vk_red">#F44336</color>
+    <color name="vk_orange">#FF9800</color>
+    <color name="vk_green">#2E7D32</color>
+    <color name="vk_green_soft">#E8F5E9</color>
+    <color name="vk_amber_soft">#FFF8E1</color>
+    <color name="vk_amber">#FF8F00</color>
+    <color name="vk_pink">#E91E63</color>
+    <color name="vk_pink_soft">#FFEEF4</color>
+    <color name="vk_gold">#FFD166</color>
+    <color name="vk_offer_start">#1E2140</color>
+    <color name="vk_offer_end">#3B3E6E</color>
+    <color name="vk_brand_start">#FF2B70</color>
+    <color name="vk_brand_end">#FF7A45</color>
+    <color name="vk_white_70">#B3FFFFFF</color>
+    <color name="vk_white_24">#3DFFFFFF</color>
+    <color name="vk_scrim">#66000000</color>
+</resources>

@@ -12,8 +12,8 @@ android {
         applicationId = "com.daily.nexamartpartner"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,7 +38,7 @@ android {
         create("prod") {
             dimension = "environment"
             buildConfigField("String", "APP_ENV", "\"production\"")
-            buildConfigField("String", "BASE_URL", "\"${project.findProperty("nexamartProdApiUrl") ?: "https://api.nexamart.example.com/api/v1/"}\"")
+            buildConfigField("String", "BASE_URL", "\"${project.findProperty("nexamartProdApiUrl") ?: "https://zeptopluse-production.up.railway.app/api/v1/"}\"")
         }
     }
 
@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.coil)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.security.crypto)
     implementation(libs.retrofit)
